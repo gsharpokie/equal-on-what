@@ -219,6 +219,17 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
         <button type="button" data-era="latest" aria-pressed="true" data-tip="Show the most recent data available.">Latest</button>
       </div>
     </div>
+    <div class="ctl"><span class="lab">Topic</span>
+      <div class="seg" id="topicSeg">
+        <button type="button" data-topic="all" aria-pressed="true">All</button>
+        <button type="button" data-topic="educ" aria-pressed="false">School</button>
+        <button type="button" data-topic="money" aria-pressed="false">Money &amp; work</button>
+        <button type="button" data-topic="health" aria-pressed="false">Health</button>
+        <button type="button" data-topic="safety" aria-pressed="false">Safety</button>
+        <button type="button" data-topic="power" aria-pressed="false">Power</button>
+        <button type="button" data-topic="time" aria-pressed="false">Time</button>
+      </div>
+    </div>
     <div class="ctl"><span class="lab">Count</span>
       <div class="seg" id="capSeg">
         <button type="button" data-cap="none" aria-pressed="true" data-tip="Every revealed row counts toward the overall balance. Gaps favoring women and gaps favoring men can offset each other.">Both ways</button>
@@ -261,6 +272,7 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
       <ol>
         <li>Before you revealed anything, did you expect most knots to move to one side? Which result surprised you most?</li>
         <li>Switch the year to “Around 1980.” Which gaps closed, which reversed, and which barely moved?</li>
+        <li>Use the Topic buttons to look at one area at a time. Which topics lean toward women, and which toward men?</li>
         <li>Open the extra measures in “School &amp; degrees.” How does the overall balance change? Who decides which measures belong on the board?</li>
         <li>Use the ×1 buttons to weight the measures you care about most. Which three would you weight most heavily, and why? Compare with a classmate.</li>
         <li>Try “Only where women are behind,” then “Only where men are behind.” Real indexes make choices like this. What does each choice assume about what inequality <em>is</em>?</li>
@@ -381,6 +393,13 @@ const DATA = [
     note: "In 1980 men earned almost three of every four doctorates. Now women earn most of them. This category includes medical and law degrees, not only Ph.D.s.",
     ask: "Women now earn most doctorates, but are still a minority of full professors and university presidents. What might explain the lag?",
     src: [S.nces32420, S.nces31810]},
+  {id: "assocshare", cat: "educ", extra: true, label: "Share of associate's degrees", title: "Share of associate's degrees earned",
+    unit: "Percent of all associate's degrees awarded that year", suf: "%", better: "higher",
+    vals: {latest: {w: 62.8, m: 37.2, year: "2021–22"}, c2000: {w: 60.2, m: 39.8, year: "1999–2000"}, c1980: {w: 54.2, m: 45.8, year: "1979–80"}},
+    say: (w, m) => `Women earned ${n1(w)}% of associate's degrees; men earned ${n1(m)}%.`,
+    note: "Women have earned more than half of associate's degrees since at least 1980, and their share has grown to about 63%. The gap is wider than for bachelor's degrees.",
+    ask: "Associate's degrees often lead to jobs in health care, business and technical fields. Which of those fields would you expect to be mostly women, and which mostly men?",
+    src: [S.nces31810]},
   {id: "naepread", cat: "educ", extra: true, kind: "sd", label: "8th-grade reading", title: "8th-grade reading scores (NAEP)",
     unit: "Average NAEP scale score, 0–500", dp: 0, better: "higher",
     vals: {latest: {w: 262.99, m: 253.24, year: "2024", sd: 40.17}, c2000: {w: 270.02, m: 256.03, year: "1998", sd: 35.14}, c1980: null},
@@ -413,11 +432,11 @@ const DATA = [
     note: "This is one of the few places where women's share went down. Women earned about 30% of computer science degrees around 1980 and about 23% now.",
     ask: "Women's share of computer science fell while their share of most other fields rose. What social changes might explain that?",
     src: [S.nces32535]},
-  {id: "dropout", cat: "educ", extra: true, label: "High school dropout", title: "Status dropout rate, ages 16–24",
+  {id: "dropout", cat: "educ", extra: true, label: "Left high school", title: "Leaving high school without a diploma, ages 16–24",
     unit: "Percent of 16- to 24-year-olds not in school and without a diploma or GED", suf: "%", better: "lower",
     vals: {latest: {w: 4.4, m: 5.5, year: "2022"}, c2000: {w: 9.9, m: 12.0, year: "2000"}, c1980: {w: 13.1, m: 15.1, year: "1980"}},
-    say: (w, m) => `${n1(m)}% of young men and ${n1(w)}% of young women are high school dropouts.`,
-    note: "Dropout rates have fallen by more than half for both sexes since 1980, a big improvement. Young men have stayed somewhat more likely to drop out.",
+    say: (w, m) => `${n1(m)}% of young men and ${n1(w)}% of young women dropped out of high school and haven’t earned a diploma or GED.`,
+    note: "The share of young people who drop out of high school without finishing has fallen by more than half for both sexes since 1980, a big improvement. Young men have stayed somewhat more likely to drop out.",
     ask: "The rate fell for everyone. Does it matter more that the gap stayed, or that both groups improved so much?",
     histNote: "NCES notes figures before 1992 may not be fully comparable with later years.",
     src: [S.nces21970]},
@@ -608,14 +627,14 @@ const DATA = [
 /* DATA:END */
 
 const state = {
-  era: "latest", cap: "none", pred: null,
+  era: "latest", cap: "none", pred: null, topic: "all",
   revealed: new Set(), open: new Set(), selected: null, weights: {}, dirChoice: {}
 };
 try { const s = JSON.parse(localStorage.getItem("eow-state") || "null"); if (s && s.dirChoice) state.dirChoice = s.dirChoice; } catch (e) {}
 function persist(){ try { localStorage.setItem("eow-state", JSON.stringify({dirChoice: state.dirChoice})); } catch (e) {} }
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function visible(){ return DATA.filter(d => !d.extra || state.open.has(d.cat)); }
+function visible(){ return DATA.filter(d => (state.topic === "all" || d.cat === state.topic) && (!d.extra || state.open.has(d.cat))); }
 function dirOf(d){ return d.better === "ambiguous" ? (state.dirChoice[d.id] || "none") : d.better; }
 
 /* signed score: + women fare better, - men fare better, magnitude 0..1; null = no data */
@@ -742,8 +761,9 @@ function update(){
     if (pts >= 1.5) knot.classList.add(B.idx > 0 ? "w" : "m");
     lean = pts < 1.5 ? "Overall: about even" : `Overall: leans ${B.idx > 0 ? "women" : "men"} (${pts.toFixed(1)} points)`;
   }
+  const topicNote = state.topic === "all" ? "" : ` · topic: ${CATS.find(c => c.id === state.topic).name}`;
   const capNote = state.cap === "women" ? " · counting only where women are behind" : state.cap === "men" ? " · counting only where men are behind" : "";
-  bt.innerHTML = `<strong>${lean}</strong><span><span class="cw">${B.nW}</span> rows favor women · <span class="cm">${B.nM}</span> favor men · ${B.nH} hidden${capNote}</span>`;
+  bt.innerHTML = `<strong>${lean}</strong><span><span class="cw">${B.nW}</span> rows favor women · <span class="cm">${B.nM}</span> favor men · ${B.nH} hidden${topicNote}${capNote}</span>`;
 
   const po = document.getElementById("predOut");
   const plab = {women: "women fare better", men: "men fare better", even: "about even"}[state.pred];
@@ -873,6 +893,14 @@ function segBind(id, key){
   }));
 }
 segBind("eraSeg", "era"); segBind("capSeg", "cap"); segBind("predSeg", "pred");
+(function(){
+  const seg = document.getElementById("topicSeg");
+  seg.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    state.topic = b.dataset.topic;
+    seg.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    buildBoard(); update(); bumpBand();
+  }));
+})();
 function syncOpenAll(){
   const all = CATS.every(c => !DATA.some(d => d.cat === c.id && d.extra) || state.open.has(c.id));
   const b = document.getElementById("openAll"); b.setAttribute("aria-pressed", all); b.textContent = all ? "Show headline measures" : "Show all measures";
