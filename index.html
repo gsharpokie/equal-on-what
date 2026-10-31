@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="How do U.S. women and men compare across 30+ measures of life outcomes? An interactive look at how the answer to 'is there gender inequality?' depends on what you measure.">
+<meta name="author" content="Gwen Sharp">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Equal on What?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a tug-of-war board. Category panels hold rows; each row's knot starts at "even" and is pulled toward the group that fares better. A sticky key names the two sides. Detail and index read-outs sit beneath. */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --ink:#14171b; --muted:#59626d; --faint:#8a929c; --line:#d8dce1; --grid:#eceef1;
+  --women:#c4570f; --men:#2b63b9; --neutral:#9aa1aa; --women-soft:#c4570f22; --men-soft:#2b63b922;
+  --focus:#14171b; --on-accent:#ffffff;
+  --display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",Impact,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121418; --surface:#1b1e23; --ink:#eceef1; --muted:#a3abb5; --faint:#78818c; --line:#30353c; --grid:#24282e;
+  --women:#d9702a; --men:#5a8ee6; --neutral:#7d8590; --women-soft:#d9702a2e; --men-soft:#5a8ee62e; --focus:#eceef1; --on-accent:#0f1114; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121418; --surface:#1b1e23; --ink:#eceef1; --muted:#a3abb5; --faint:#78818c; --line:#30353c; --grid:#24282e;
+  --women:#d9702a; --men:#5a8ee6; --neutral:#7d8590; --women-soft:#d9702a2e; --men-soft:#5a8ee62e; --focus:#eceef1; --on-accent:#0f1114; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1160px;margin:0 auto;padding-block:40px 72px}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- header ---------- */
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:.86;letter-spacing:.005em;
+  font-size:clamp(56px,11vw,128px);margin:10px 0 18px;text-wrap:balance}
+h1 .q{display:inline-block;color:var(--women)}
+h1 .q2{color:var(--men)}
+.lede{max-width:64ch;font-size:clamp(17px,2vw,19px);color:var(--ink);margin:0}
+.lede + .lede{margin-top:10px;color:var(--muted);font-size:16px}
+
+/* ---------- prediction ---------- */
+.predict{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:26px;padding:12px 14px;border:1px dashed var(--muted);border-radius:8px}
+.predict .lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.predict .pq{font-weight:600;min-width:0}
+.predict .pout{flex:1 1 100%;font-size:15px;color:var(--ink)}
+.predict .pout:empty{display:none}
+
+/* ---------- controls ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:28px 0 14px;
+  padding-block:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ctl > .lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:6px 11px;font-size:14px;cursor:pointer;color:var(--muted)}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 12px;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.spacer{flex:1 1 auto}
+
+/* ---------- scoreboard ---------- */
+.score{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
+@media (max-width:760px){.score{grid-template-columns:minmax(0,1fr)}}
+.tally{display:flex;gap:10px;flex-wrap:wrap}
+.tile{flex:1 1 120px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-width:0}
+.tile .n{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.tile .t{font-size:13px;color:var(--muted);line-height:1.3;margin-top:4px}
+.tile.w .n{color:var(--women)} .tile.m .n{color:var(--men)}
+.meter{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px 12px;min-width:0}
+.meter .head{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.meter .title{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.meter .verdict{font-weight:700;font-size:15px}
+.mtrack{position:relative;height:26px;margin:12px 0 4px;border-radius:13px;
+  background:linear-gradient(90deg,var(--men-soft),transparent 50%,var(--women-soft))}
+.mtrack::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--muted)}
+.needle{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid var(--surface);
+  transform:translate(-50%,-50%);left:50%;transition:left .8s cubic-bezier(.2,.8,.2,1)}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+
+/* ---------- key (sticky) ---------- */
+.key{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;margin:6px 0 10px;background:var(--bg);padding-block:8px}
+.keybar{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.keybar > span{padding:9px 12px;font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.03em;font-size:clamp(15px,2.4vw,20px);line-height:1.05;display:flex;align-items:center;gap:8px}
+.keybar .km{background:var(--men);color:var(--on-accent);justify-content:flex-start}
+.keybar .kw{background:var(--women);color:var(--on-accent);justify-content:flex-end;text-align:right}
+.keybar .ke{background:var(--surface);color:var(--muted);font-size:13px;font-family:var(--mono);font-weight:500;padding-inline:10px;justify-content:center}
+.keynote{font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
+
+/* ---------- board ---------- */
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:12px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 12px 6px;min-width:0}
+.phead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.panel h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:22px;letter-spacing:.03em;margin:0;line-height:1}
+.more-btn{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:3px 11px;font-size:12px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.more-btn:hover{border-color:var(--muted)}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:stretch;gap:6px;border-top:1px solid var(--grid)}
+.row:first-child{border-top:0}
+.rbtn{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);grid-template-areas:"lab track" "lab text";column-gap:12px;row-gap:2px;align-items:center;
+  text-align:left;border:0;background:transparent;padding:10px 6px;border-radius:6px;cursor:pointer}
+.rbtn:hover{background:var(--grid)}
+.row.sel .rbtn{background:var(--grid)}
+.rlabel{grid-area:lab;font-weight:600;font-size:14px;line-height:1.25;align-self:start;padding-top:2px}
+.row.extra .rlabel::after{content:"extra";display:inline-block;margin-left:6px;font-family:var(--mono);font-size:10px;font-weight:400;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;vertical-align:1px}
+.track{grid-area:track;position:relative;height:26px;border-radius:13px;background:linear-gradient(90deg,var(--men-soft),transparent 50%,var(--women-soft))}
+.rope{position:absolute;left:4%;right:4%;top:50%;height:2px;margin-top:-1px;background:var(--line);border-radius:1px}
+.rope::before,.rope::after{content:"";position:absolute;top:-4px;width:2px;height:10px;background:var(--line)}
+.rope::before{left:0;background:var(--men);opacity:.6}.rope::after{right:0;background:var(--women);opacity:.6}
+.mid{position:absolute;left:50%;top:2px;bottom:2px;width:2px;margin-left:-1px;background:var(--muted)}
+.pull{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:2px;width:0;left:50%;transition:left .8s cubic-bezier(.2,.8,.2,1),width .8s cubic-bezier(.2,.8,.2,1)}
+.knot{position:absolute;top:50%;left:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--surface);border:2px dashed var(--muted);
+  display:grid;place-items:center;transition:left .8s cubic-bezier(.2,.8,.2,1),background-color .3s,border-color .3s;z-index:2}
+.qm{font-family:var(--display);font-weight:800;font-size:13px;color:var(--muted);line-height:1}
+.row:not(.hidden) .qm{display:none}
+.row.w .knot{background:var(--women);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--women)}
+.row.m .knot{background:var(--men);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--men)}
+.row.n .knot{background:var(--neutral);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--neutral)}
+.row.nodata .knot{border-style:dotted;opacity:.5}
+.row.w .pull{background:var(--women)} .row.m .pull{background:var(--men)}
+.rbtn:hover .knot{border-color:var(--ink)}
+.rtext{grid-area:text;font-size:13px;line-height:1.35;color:var(--muted);min-height:1.35em}
+.row.hidden .rtext{font-style:italic;color:var(--faint)}
+.row.w .rtext,.row.m .rtext{color:var(--ink)}
+@media (max-width:560px){
+  .rbtn{grid-template-columns:minmax(0,1fr);grid-template-areas:"lab" "track" "text";row-gap:4px}
+}
+.wt{flex:0 0 auto;align-self:center;font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:12px;padding:3px 9px;background:var(--bg);cursor:pointer;color:var(--ink);min-width:42px}
+.wt[data-w="0"]{color:var(--faint);text-decoration:line-through}
+.totop{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;
+  border:1px solid var(--line);background:var(--ink);color:var(--bg);border-radius:22px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px #0003;transition:opacity .2s}
+.totop[hidden]{display:none!important}
+
+/* ---------- detail ---------- */
+.detail{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px clamp(14px,3vw,26px) 20px;scroll-margin-top:16px}
+.detail .cat{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.detail h3{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(26px,4vw,36px);line-height:1;margin:4px 0 8px;text-wrap:balance}
+.headline{font-size:clamp(18px,2.4vw,22px);font-weight:600;margin:0 0 14px;max-width:60ch;text-wrap:pretty}
+.dgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:22px}
+@media (max-width:760px){.dgrid{grid-template-columns:minmax(0,1fr)}}
+.pair{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:6px 10px;align-items:center;font-size:14px}
+.pair .who{color:var(--muted)}
+.pair .rail{height:14px;background:var(--grid);border-radius:3px;position:relative;overflow:hidden}
+.pair .fill{position:absolute;left:0;top:0;bottom:0;border-radius:0 3px 3px 0;transition:width .6s}
+.pair .num{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.unit{font-size:13px;color:var(--muted);margin-top:6px}
+.hist{margin-top:16px;overflow-x:auto}
+.hist h4,.dtext h4{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:500}
+.hist table{border-collapse:collapse;width:100%;font-size:13px}
+.hist td,.hist th{padding:4px 6px;border-bottom:1px solid var(--grid);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hist th{font-weight:600;color:var(--muted);font-size:12px}
+.hist td:first-child,.hist th:first-child{text-align:left}
+.dtext p{margin:0 0 14px;max-width:66ch}
+.ask{border-left:3px solid var(--ink);padding-left:12px;font-style:italic}
+.src{font-size:13px;color:var(--muted)}
+.src a{color:var(--muted)}
+.dirpick{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--line);border-radius:6px;font-size:14px}
+.dirpick .seg{margin-top:6px}
+.empty{color:var(--muted);font-size:15px}
+
+/* ---------- below the fold ---------- */
+section.more{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px 36px}
+section.more h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:26px;margin:0 0 8px;line-height:1}
+section.more p,section.more li{max-width:66ch;font-size:15px}
+section.more ol,section.more ul{padding-left:20px;margin:0}
+section.more li{margin-bottom:8px}
+.tablewrap{margin-top:36px}
+.tablewrap summary{cursor:pointer;font-weight:600}
+.tscroll{overflow-x:auto;margin-top:10px}
+.tscroll table{border-collapse:collapse;font-size:13px;min-width:720px;width:100%}
+.tscroll th,.tscroll td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tscroll td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap" lang="en" id="top">
+  <header>
+    <div class="eyebrow">Gender &amp; inequality · United States · By Gwen Sharp · <a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a></div>
+    <h1>Equal <span class="q">on</span> <span class="q q2">what?</span></h1>
+    <p class="lede">Is the U.S. gender-equal? The answer depends on what you measure. Each row below is one part of life. Think of each one as a tug-of-war: the knot starts in the middle, at <strong>even</strong>. Tap a row to see which way it moves.</p>
+    <p class="lede">The knot moves toward whichever group comes out ahead on that measure: left for men, right for women. The farther it moves, the bigger the gap.</p>
+  </header>
+
+  <div class="predict">
+    <span class="lab">Before you start</span>
+    <span class="pq">Across everything on this board, who do you think fares better in the U.S. today?</span>
+    <div class="seg" id="predSeg">
+      <button type="button" data-pred="women" aria-pressed="false">Women</button>
+      <button type="button" data-pred="men" aria-pressed="false">Men</button>
+      <button type="button" data-pred="even" aria-pressed="false">About even</button>
+    </div>
+    <span class="pout" id="predOut" aria-live="polite"></span>
+  </div>
+
+  <div class="controls" role="group" aria-label="Controls">
+    <div class="ctl"><span class="lab">Year</span>
+      <div class="seg" id="eraSeg">
+        <button type="button" data-era="c1980" aria-pressed="false">Around 1980</button>
+        <button type="button" data-era="c2000" aria-pressed="false">Around 2000</button>
+        <button type="button" data-era="latest" aria-pressed="true">Latest</button>
+      </div>
+    </div>
+    <button type="button" class="btn" id="openAll" aria-pressed="false">Open every panel</button>
+    <div class="spacer"></div>
+    <button type="button" class="btn primary" id="revealAll">Reveal all</button>
+    <button type="button" class="btn" id="resetAll">Reset to even</button>
+  </div>
+
+  <div class="score">
+    <div class="tally" aria-live="polite">
+      <div class="tile w"><div class="n" id="nW">0</div><div class="t">measures where women fare better</div></div>
+      <div class="tile m"><div class="n" id="nM">0</div><div class="t">measures where men fare better</div></div>
+      <div class="tile"><div class="n" id="nH">0</div><div class="t">still hidden</div></div>
+    </div>
+    <div class="meter">
+      <div class="head"><span class="title">Your index · average of the revealed rows</span><span class="verdict" id="verdict">Nothing revealed yet</span></div>
+      <div class="mtrack" aria-hidden="true"><div class="needle" id="needle"></div></div>
+      <div class="ends"><span>Men fare better</span><span>Even</span><span>Women fare better</span></div>
+      <div class="ctl" style="margin-top:10px"><span class="lab">Count</span>
+        <div class="seg" id="capSeg">
+          <button type="button" data-cap="none" aria-pressed="true">Both directions</button>
+          <button type="button" data-cap="women" aria-pressed="false">Only where women are behind</button>
+          <button type="button" data-cap="men" aria-pressed="false">Only where men are behind</button>
+        </div>
+        <button type="button" class="btn" id="weightBtn" aria-pressed="false">Weight the measures</button>
+      </div>
+      <p id="capNote" style="margin:8px 0 0;font-size:13px;color:var(--muted);max-width:60ch"></p>
+    </div>
+  </div>
+
+  <div class="key">
+    <div class="keybar"><span class="km">◀ Men fare better</span><span class="ke">even</span><span class="kw">Women fare better ▶</span></div>
+    <div class="keynote">The knot moves toward whoever comes out ahead. The farther it moves, the bigger the gap. Gray means there's no obvious “better,” so you decide.</div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="detail" id="detail" aria-live="polite"><p class="empty">Tap any row to see the numbers behind it.</p></div>
+
+  <section class="more">
+    <div>
+      <h2>What counts as inequality?</h2>
+      <p>Any claim about gender inequality makes choices, often without saying so. This board makes them visible.</p>
+      <ul>
+        <li><strong>Which outcomes count.</strong> Earnings and leadership are standard measures. Life expectancy, imprisonment and deaths on the job are often left out.</li>
+        <li><strong>Which direction counts.</strong> Some indexes only count gaps where women are behind.</li>
+        <li><strong>Gaps or levels.</strong> A gap can stay about the same while both groups get much better off (heart disease deaths) or much worse off (overdose deaths).</li>
+        <li><strong>When you look.</strong> A gap that is “stuck” over five years may have closed dramatically over forty.</li>
+        <li><strong>Averages or groups.</strong> A national average for “women” or “men” can hide large differences by race, class, age and place.</li>
+        <li><strong>Outcomes or treatment.</strong> A gap in outcomes doesn't by itself show unfair treatment, and equal outcomes don't prove fair treatment.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Talk about it</h2>
+      <ol>
+        <li>Before you revealed anything, did you expect most knots to move to one side? Which result surprised you most?</li>
+        <li>Switch the year to “Around 1980.” Which gaps closed, which reversed, and which barely moved?</li>
+        <li>Open the “School &amp; degrees” panel’s extra measures. How does the tally change? Who decides which measures belong on the board?</li>
+        <li>Turn on “Weight the measures.” Which three measures would you weight most heavily, and why? Compare with a classmate.</li>
+        <li>Try “Only where women are behind,” then “Only where men are behind.” Real indexes make choices like this. What does each choice assume about what inequality <em>is</em>?</li>
+        <li>Averages for “women” and “men” hide big differences by race, class, age, and region. Pick one row and predict how it might change for a specific group.</li>
+        <li>A gap tells you <em>that</em> groups differ, not <em>why</em>. For one row, list two possible explanations a sociologist would want to test.</li>
+      </ol>
+    </div>
+    <div>
+      <h2>How to read the board</h2>
+      <p>Each knot’s distance from the middle shows how far apart women and men are on one measure, as a percentage: the smaller number is this much below the larger one. If women earn 81 cents for each dollar men earn, the gap is 19%. If men are four times as likely to die by homicide, the gap is 75%.</p>
+      <p>The side and color show who comes out ahead. For some measures higher is better (life expectancy, earnings). For others lower is better (homicide, poverty). A few have no obvious “better” direction, so their knots stay gray in the middle until you choose.</p>
+      <p>Why are some shares “better” and others gray? A bigger share of all degrees, or of seats in Congress, means more education or more power for that group. A share of one field is different: more women in computer science means fewer men there, and the pay effects already show up in the earnings row. Whether a field split is a problem depends on why it exists, so you decide.</p>
+      <p>Test scores are on scales without a true zero, so their rows compare the score difference to the spread of scores (the standard deviation) instead.</p>
+      <p>The index is a simple average of the signed gaps for the rows you’ve revealed. It’s a thinking tool, not a published measure.</p>
+    </div>
+    <div>
+      <h2>Why this matters</h2>
+      <p>Real indexes of gender equality have to choose measures, weights, and rules. The World Economic Forum’s Global Gender Gap Index, for example, caps each score at parity, so areas where women are ahead don’t count toward the total. Other researchers have built indexes that count gaps in both directions, and critics have challenged their choices too.</p>
+      <p>Neither approach is simply right. Each one answers a different question. That is the point to take away: “Is there gender inequality?” is really several questions, and the answer depends on which ones you ask.</p>
+      <p>Other fields help here. Economists separate the raw pay gap from the gap that remains after accounting for jobs and hours. Public health researchers study why men die younger. Criminologists track who commits violence as well as who experiences it.</p>
+    </div>
+  </section>
+
+  <details class="tablewrap" id="tableWrap">
+    <summary>All the numbers, with sources</summary>
+    <div class="tscroll"><table id="dataTable"></table></div>
+  </details>
+
+  <footer id="foot"></footer>
+</div>
+<button type="button" class="totop" id="toTop" hidden>↑ Back to top</button>
+
+<script>
+/* DATA:START */
+const AS_OF = "October 31, 2026";
+const CATS = [
+  {id: "educ", name: "School & degrees"},
+  {id: "money", name: "Money & work"},
+  {id: "health", name: "Health & life"},
+  {id: "safety", name: "Safety & justice"},
+  {id: "power", name: "Power"},
+  {id: "time", name: "Time"}
+];
+const n1 = x => x.toLocaleString("en-US", {maximumFractionDigits: 1, minimumFractionDigits: 1});
+const times = (a, b) => (a / b).toFixed(1);
+function ratioSay(w, m, what){
+  if (w === m) return `Women and men are equal on ${what}.`;
+  return w > m ? `Women's ${what} is ${times(w, m)} times men's.` : `Men's ${what} is ${times(m, w)} times women's.`;
+}
+const S = {
+  censusA2: {name: "U.S. Census Bureau, CPS Historical Table A-2", url: "https://www.census.gov/data/tables/time-series/demo/educational-attainment/cps-historical-time-series.html"},
+  nces31810: {name: "NCES Digest 2023, Table 318.10", url: "https://nces.ed.gov/programs/digest/d23/tables/dt23_318.10.asp?current=yes"},
+  nces32220: {name: "NCES Digest 2024, Table 322.20", url: "https://nces.ed.gov/programs/digest/d24/tables/dt24_322.20.asp"},
+  nces32420: {name: "NCES Digest 2024, Table 324.20", url: "https://nces.ed.gov/programs/digest/d24/tables/dt24_324.20.asp"},
+  nces32545: {name: "NCES Digest 2022, Table 325.45", url: "https://nces.ed.gov/programs/digest/d22/tables/dt22_325.45.asp?current=yes"},
+  nces32535: {name: "NCES Digest 2023, Table 325.35", url: "https://nces.ed.gov/programs/digest/d23/tables/dt23_325.35.asp?current=yes"},
+  nces21970: {name: "NCES Digest 2023, Table 219.70", url: "https://nces.ed.gov/programs/digest/d23/tables/dt23_219.70.asp?current=yes"},
+  naep: {name: "NAEP Data Service (Nation's Report Card)", url: "https://www.nationsreportcard.gov/DataService/GetAdhocData.aspx?type=data&subject=reading&grade=8&subscale=RRPCM&variable=GENDER&jurisdiction=NT&stattype=MN:MN&Year=2024"},
+  sat: {name: "College Board, 2025 SAT Suite Annual Report", url: "https://reports.collegeboard.org/media/pdf/2025-total-group-sat-suite-of-assessments-annual-report.pdf"},
+  income: {name: "U.S. Census Bureau, Income in the United States: 2025, Table 12", url: "https://www.census.gov/library/publications/2026/demo/p60-289.html"},
+  poverty: {name: "U.S. Census Bureau, Poverty in the United States: 2025, and Historical Poverty Table 7", url: "https://www.census.gov/library/publications/2026/demo/p60-290.html"},
+  bls3: {name: "BLS, CPS Table 3 (2025)", url: "https://www.bls.gov/cps/cpsaat03.htm"},
+  blsDatabook: {name: "BLS, Women in the Labor Force: A Databook", url: "https://www.bls.gov/opub/reports/womens-databook/2023/"},
+  cfoi: {name: "BLS, Census of Fatal Occupational Injuries, 2024", url: "https://www.bls.gov/news.release/cfoi.nr0.htm"},
+  cfoi00: {name: "BLS, CFOI 2000 release", url: "https://www.bls.gov/news.release/history/cfoi_08172001.txt"},
+  db548: {name: "NCHS Data Brief 548, Mortality in the United States, 2024", url: "https://www.cdc.gov/nchs/products/databriefs/db548.htm"},
+  hus4: {name: "NCHS, Health, United States 2019, Table 4", url: "https://www.cdc.gov/nchs/data/hus/2019/004-508.pdf"},
+  db572: {name: "NCHS Data Brief 572, Suicide Rates 2023–2024", url: "https://www.cdc.gov/nchs/products/databriefs/db572.htm"},
+  slct: {name: "NCHS, Health, United States 2020–2021, Table SlctMort", url: "https://www.cdc.gov/nchs/data/hus/2020-2021/SlctMort.pdf"},
+  db549: {name: "NCHS Data Brief 549, Drug Overdose Deaths 2023–2024", url: "https://www.cdc.gov/nchs/products/databriefs/db549.htm"},
+  odmort: {name: "NCHS, Health, United States 2020–2021, Table ODMort", url: "https://www.cdc.gov/nchs/data/hus/2020-2021/ODMort.pdf"},
+  nsduh: {name: "SAMHSA, 2025 NSDUH Detailed Tables, Table 6.45B", url: "https://www.samhsa.gov/data/report/2025-nsduh-detailed-tables"},
+  vsrr: {name: "NCHS, Quarterly Mortality Estimates (final 2024 data)", url: "https://www.cdc.gov/nchs/nvss/vsrr/mortality-dashboard.htm"},
+  nhis: {name: "NCHS, NHIS Early Release: Health Insurance Coverage, 2025", url: "https://www.cdc.gov/nchs/data/nhis/earlyrelease/Health-Insurance-Coverage-Early-Release-of-Estimates-2025.pdf"},
+  cv24: {name: "BJS, Criminal Victimization, 2024", url: "https://bjs.ojp.gov/document/cv24.pdf"},
+  ndash: {name: "BJS, NCVS Dashboard (N-DASH)", url: "https://ncvs.bjs.ojp.gov/"},
+  nisvs: {name: "CDC, NISVS 2023/2024 Intimate Partner Violence Data Brief", url: "https://www.cdc.gov/nisvs/media/pdfs/intimatepartnerviolence-brief.pdf"},
+  nisvs17: {name: "CDC, NISVS 2016/2017 Report on Intimate Partner Violence", url: "https://www.cdc.gov/nisvs/documentation/NISVSReportonIPV_2022.pdf"},
+  hvus: {name: "BJS, Homicide Victimization in the United States, 2025", url: "https://bjs.ojp.gov/document/hvus25.pdf"},
+  fbiShr: {name: "FBI Crime Data Explorer, Expanded Homicide Data", url: "https://cde.ucr.cjis.gov/"},
+  fbi19: {name: "FBI, Crime in the U.S. 2019, Expanded Homicide Table 6", url: "https://ucr.fbi.gov/crime-in-the-u.s/2019/crime-in-the-u.s.-2019/tables/expanded-homicide-data-table-6.xls"},
+  p23: {name: "BJS, Prisoners in 2023 – Statistical Tables", url: "https://bjs.ojp.gov/document/p23st.pdf"},
+  p00: {name: "BJS, Prisoners in 2000", url: "https://bjs.ojp.gov/content/pub/pdf/p00.pdf"},
+  p81: {name: "BJS, Prisoners 1925–81", url: "https://bjs.ojp.gov/content/pub/pdf/p2581.pdf"},
+  ahar: {name: "HUD, 2024 AHAR Part 1, Exhibit 1-6", url: "https://www.huduser.gov/portal/sites/default/files/pdf/2024-AHAR-Part-1.pdf"},
+  cawp: {name: "CAWP (Rutgers), Current Numbers and Women in Elective Office", url: "https://cawp.rutgers.edu/facts/current-numbers/women-elective-office-2024"},
+  fortune: {name: "Fortune, Women CEOs of the 2026 Fortune 500", url: "https://www.fortune.com/2026/06/03/gm-fortune-500-highest-ranking-company-female-ceo-elevance-health-centene/"},
+  catalyst: {name: "Catalyst, 2000 Census of Women Corporate Officers", url: "https://classic.catalyst.org/wp-content/uploads/2019/02/2000_catalyst_census_women_corporate_officers.pdf"},
+  atus: {name: "BLS, American Time Use Survey 2025, Table 1", url: "https://www.bls.gov/news.release/atus.t01.htm"},
+  atus03: {name: "BLS, American Time Use Survey 2003 release", url: "https://www.bls.gov/news.release/archives/atus_09142004.pdf"}
+};
+
+const DATA = [
+  /* ---------------- School & degrees ---------------- */
+  {id: "bach", cat: "educ", label: "College degree, age 25+", title: "Bachelor's degree or more, adults 25+",
+    unit: "Percent of adults 25 and older", suf: "%", better: "higher",
+    vals: {latest: {w: 40.9, m: 37.7, year: "2025"}, c2000: {w: 23.6, m: 27.8, year: "2000"}, c1980: {w: 13.6, m: 20.9, year: "1980"}},
+    say: (w, m) => `${n1(w)}% of women and ${n1(m)}% of men age 25+ have at least a bachelor's degree.`,
+    note: "This is one of the biggest reversals on the board. In 1980, men were much more likely to have finished college. Now women are ahead, and women earn about 58% of all bachelor's degrees. Sociologists and economists are still debating why men's college-going has lagged.",
+    ask: "If more education usually means higher pay, why hasn't women's lead in degrees closed the earnings gap?",
+    histNote: "Before 1992 Census measured “4 or more years of college” rather than degrees earned.",
+    src: [S.censusA2]},
+  {id: "bachshare", cat: "educ", extra: true, label: "Share of BA degrees", title: "Share of bachelor's degrees earned",
+    unit: "Percent of all bachelor's degrees awarded that year", suf: "%", better: "higher",
+    vals: {latest: {w: 58.4, m: 41.6, year: "2022–23"}, c2000: {w: 57.2, m: 42.8, year: "1999–2000"}, c1980: {w: 49.0, m: 51.0, year: "1979–80"}},
+    say: (w, m) => `Women earned ${n1(w)}% of bachelor's degrees; men earned ${n1(m)}%.`,
+    note: "Women first earned more than half of bachelor's degrees in the early 1980s, and their share has stayed well above half since 2000.",
+    ask: "Colleges now enroll more women than men. Should colleges try to recruit more men, the way they once worked to recruit women?",
+    src: [S.nces32220, S.nces31810]},
+  {id: "docshare", cat: "educ", extra: true, label: "Share of doctorates", title: "Share of doctoral degrees earned",
+    unit: "Percent of doctor's degrees awarded (includes M.D., J.D. and similar degrees)", suf: "%", better: "higher",
+    vals: {latest: {w: 58.0, m: 42.0, year: "2022–23"}, c2000: null, c1980: {w: 27.3, m: 72.7, year: "1979–80"}},
+    say: (w, m) => `Women earned ${n1(w)}% of doctoral and professional doctorates; men earned ${n1(m)}%.`,
+    note: "In 1980 men earned almost three of every four doctorates. Now women earn most of them. This category includes medical and law degrees, not only Ph.D.s.",
+    ask: "Women now earn most doctorates, but are still a minority of full professors and university presidents. What might explain the lag?",
+    src: [S.nces32420, S.nces31810]},
+  {id: "naepread", cat: "educ", extra: true, kind: "sd", label: "8th-grade reading", title: "8th-grade reading scores (NAEP)",
+    unit: "Average NAEP scale score, 0–500", dp: 0, better: "higher",
+    vals: {latest: {w: 262.99, m: 253.24, year: "2024", sd: 40.17}, c2000: {w: 270.02, m: 256.03, year: "1998", sd: 35.14}, c1980: null},
+    say: (w, m) => `Girls outscore boys by about ${Math.round(w - m)} points in 8th-grade reading.`,
+    note: "Girls outscored boys in reading in every year we checked (1992, 1998, 2022 and 2024). Test scores have no true zero, so this row compares the score gap to the spread of scores (standard deviation). A gap of 0.24 SD is modest but meaningful.",
+    ask: "Why might a reading gap in middle school matter for who goes to college later?",
+    histNote: "Distance from the middle = score gap ÷ standard deviation of all students' scores that year.",
+    src: [S.naep]},
+  {id: "naepmath", cat: "educ", extra: true, kind: "sd", label: "8th-grade math", title: "8th-grade math scores (NAEP)",
+    unit: "Average NAEP scale score, 0–500", dp: 0, better: "higher",
+    vals: {latest: {w: 271.78, m: 275.80, year: "2024", sd: 41.96}, c2000: {w: 272.27, m: 273.91, year: "2000", sd: 38.06}, c1980: null},
+    say: (w, m) => `Boys outscore girls by about ${Math.round(m - w)} points in 8th-grade math.`,
+    note: "The math gap favoring boys is small, about a tenth of a standard deviation, and smaller than the reading gap favoring girls. On the 2025 SAT, men averaged 515 in math and women 500, while women and men were nearly even in reading and writing (522 vs. 520). SAT takers are a self-selected group, so those scores don't represent all students.",
+    ask: "The math gap is small. Why do you think the belief that boys are better at math is so persistent?",
+    histNote: "Distance from the middle = score gap ÷ standard deviation of all students' scores that year.",
+    src: [S.naep, S.sat]},
+  {id: "eng", cat: "educ", extra: true, label: "Engineering degrees", title: "Women's share of engineering bachelor's degrees",
+    unit: "Percent of engineering and engineering-technology bachelor's degrees", suf: "%", better: "ambiguous",
+    dirq: "Engineering jobs pay well. Is being underrepresented a disadvantage, or does the earnings row already capture that? Men are also a small minority in fields like nursing and teaching. Should those count the other way?",
+    vals: {latest: {w: 23.0, m: 77.0, year: "2020–21"}, c2000: {w: 18.6, m: 81.4, year: "1999–2000"}, c1980: {w: 9.4, m: 90.6, year: "1979–80"}},
+    say: (w, m) => `Women earned ${n1(w)}% of engineering bachelor's degrees.`,
+    note: "Women's share of engineering degrees has more than doubled since 1980 but is still under a quarter. This series includes engineering technologies and some trades.",
+    ask: "Should we treat an uneven split by field as inequality, as choice, or as both? What evidence would help you decide?",
+    src: [S.nces32545]},
+  {id: "cs", cat: "educ", extra: true, label: "Computer science degrees", title: "Women's share of computer science bachelor's degrees",
+    unit: "Percent of computer and information sciences bachelor's degrees", suf: "%", better: "ambiguous",
+    dirq: "Computer science jobs pay well. Is being underrepresented a disadvantage, or does the earnings row already capture that? And if AI changes coding work, could a big share turn into a risk instead?",
+    vals: {latest: {w: 22.6, m: 77.4, year: "2021–22"}, c2000: {w: 28.1, m: 71.9, year: "1999–2000"}, c1980: {w: 30.2, m: 69.8, year: "1979–80"}},
+    say: (w, m) => `Women earned ${n1(w)}% of computer science bachelor's degrees.`,
+    note: "This is one of the few places where women's share went down. Women earned about 30% of computer science degrees around 1980 and about 23% now.",
+    ask: "Women's share of computer science fell while their share of most other fields rose. What social changes might explain that?",
+    src: [S.nces32535]},
+  {id: "dropout", cat: "educ", extra: true, label: "High school dropout", title: "Status dropout rate, ages 16–24",
+    unit: "Percent of 16- to 24-year-olds not in school and without a diploma or GED", suf: "%", better: "lower",
+    vals: {latest: {w: 4.4, m: 5.5, year: "2022"}, c2000: {w: 9.9, m: 12.0, year: "2000"}, c1980: {w: 13.1, m: 15.1, year: "1980"}},
+    say: (w, m) => `${n1(m)}% of young men and ${n1(w)}% of young women are high school dropouts.`,
+    note: "Dropout rates have fallen by more than half for both sexes since 1980, a big improvement. Young men have stayed somewhat more likely to drop out.",
+    ask: "The rate fell for everyone. Does it matter more that the gap stayed, or that both groups improved so much?",
+    histNote: "NCES notes figures before 1992 may not be fully comparable with later years.",
+    src: [S.nces21970]},
+
+  /* ---------------- Money & work ---------------- */
+  {id: "earn", cat: "money", label: "Earnings", title: "Median earnings, full-time year-round workers",
+    unit: "Median annual earnings, in 2025 dollars", pre: "$", dp: 0, better: "higher",
+    vals: {latest: {w: 60760, m: 72380, year: "2025"}, c2000: {w: 48110, m: 65260, year: "2000"}, c1980: {w: 39000, m: 64830, year: "1980"}},
+    say: (w, m) => `Women working full time earn about ${Math.round(w / m * 100)} cents for every dollar men earn.`,
+    note: "This compares the typical full-time woman with the typical full-time man across all jobs, not men and women in the same job. Economists find that much of the gap is linked to differences in occupation, industry and hours, and to a drop in mothers' earnings after children arrive. Part of the gap remains after those are taken into account. The ratio rose from 60% in 1980 to 84% in 2025, one of the clearest improvements on the board.",
+    ask: "Some of the gap comes from women and men working in different jobs. Is that part of the gap a fair outcome, or is it inequality too?",
+    src: [S.income]},
+  {id: "poverty", cat: "money", label: "Poverty", title: "Official poverty rate",
+    unit: "Percent of people below the official poverty line", suf: "%", better: "lower",
+    vals: {latest: {w: 11.1, m: 9.2, year: "2025"}, c2000: {w: 12.6, m: 9.9, year: "2000"}, c1980: {w: 14.7, m: 11.2, year: "1980"}},
+    say: (w, m) => `${n1(w)}% of women and ${n1(m)}% of men live below the poverty line.`,
+    note: "Women's higher poverty rate is tied to lower earnings, to raising children alone (single parents are more often mothers), and to living longer with fewer retirement resources. The gap is widest at 65 and older: 10.7% of older women versus 8.6% of older men in 2025. In 1980 it was 19.0% versus 10.9%, so the gap among older adults has narrowed a lot.",
+    ask: "Women live longer than men. How can a health advantage turn into an economic disadvantage?",
+    src: [S.poverty]},
+  {id: "lfp", cat: "money", extra: true, label: "In the labor force, 25–54", title: "Labor force participation, ages 25–54",
+    unit: "Percent working or looking for work", suf: "%", better: "ambiguous",
+    dirq: "Is more paid work “better”? Paid work brings income and independence, but people outside the labor force may be raising children, caring for relatives or in school.",
+    vals: {latest: {w: 77.8, m: 89.4, year: "2025"}, c2000: {w: 76.7, m: 91.6, year: "2000"}, c1980: {w: 64.0, m: 94.2, year: "1980"}},
+    say: (w, m) => `${n1(w)}% of women and ${n1(m)}% of men ages 25–54 are in the labor force.`,
+    note: "Women's labor force participation rose sharply from 1980 to 2000. Men's has slowly declined. Economists study men's falling participation as its own social problem.",
+    ask: "Men's participation has been falling for decades. Is that a gain in choice, a sign of trouble, or both?",
+    histNote: "BLS says 2025 averages exclude October because of the federal shutdown.",
+    src: [S.bls3, S.blsDatabook]},
+  {id: "workdeath", cat: "money", label: "Deaths on the job", title: "Fatal work injuries",
+    unit: "Number of workers killed on the job", dp: 0, better: "lower",
+    vals: {latest: {w: 413, m: 4657, year: "2024"}, c2000: {w: 448, m: 5467, year: "2000"}, c1980: null},
+    say: (w, m) => `${m.toLocaleString()} men and ${w.toLocaleString()} women died from work injuries. Men are ${Math.round(m / (w + m) * 100)}% of those deaths.`,
+    note: "These are counts, not rates. Men work more paid hours and are concentrated in the most dangerous jobs, such as construction and transportation. Some economists argue that part of men's higher pay is compensation for that risk.",
+    ask: "Dangerous jobs often pay more. Should workplace risk count in an index of gender equality?",
+    histNote: "BLS's fatality census began in 1992, so there is no 1980 figure in this series.",
+    src: [S.cfoi, S.cfoi00]},
+
+  /* ---------------- Health & life ---------------- */
+  {id: "life", cat: "health", label: "Life expectancy", title: "Life expectancy at birth",
+    unit: "Years", suf: " yrs", better: "higher",
+    vals: {latest: {w: 81.4, m: 76.5, year: "2024"}, c2000: {w: 79.3, m: 74.1, year: "2000"}, c1980: {w: 77.4, m: 70.0, year: "1980"}},
+    say: (w, m) => `Women live about ${n1(w - m)} years longer than men.`,
+    note: "Women outlive men in the U.S. and in most countries. Researchers point to both biology and behavior. Men die at higher rates from heart disease, accidents, overdoses, suicide and homicide. Notice how close to the middle this knot stays: a five-year difference in lifespan is only a 6% gap. How you measure a gap shapes how big it looks.",
+    ask: "The knot barely moves, but five years is a lot of life. Is a percentage the right way to compare it with earnings?",
+    src: [S.db548, S.hus4]},
+  {id: "suicide", cat: "health", label: "Suicide", title: "Suicide death rate",
+    unit: "Deaths per 100,000 people, age-adjusted", better: "lower",
+    vals: {latest: {w: 5.6, m: 22.3, year: "2024"}, c2000: {w: 4.0, m: 17.7, year: "2000"}, c1980: {w: 5.7, m: 19.9, year: "1980"}},
+    say: (w, m) => ratioSay(w, m, "suicide death rate"),
+    note: "Men die by suicide at about four times women's rate. Women report more depression and make more suicide attempts, but men more often use highly lethal methods. Rates fell for both sexes from 2023 to 2024. If this topic is personal for you, you can call or text 988 to reach the 988 Suicide & Crisis Lifeline.",
+    ask: "Women report more depression, but men die by suicide more often. What does that suggest about how men and women seek help?",
+    src: [S.db572, S.slct]},
+  {id: "overdose", cat: "health", label: "Overdose deaths", title: "Drug overdose death rate",
+    unit: "Deaths per 100,000 people, age-adjusted", better: "lower",
+    vals: {latest: {w: 14.1, m: 32.2, year: "2024"}, c2000: {w: 4.1, m: 8.3, year: "2000"}, c1980: null},
+    say: (w, m) => ratioSay(w, m, "overdose death rate"),
+    note: "Overdose deaths rose steeply for both sexes after 2000 and peaked in 2022 (45.6 per 100,000 for men, 19.4 for women). They fell sharply in 2024, by 27% for men and 23% for women.",
+    ask: "Overdose deaths got much worse for both women and men after 2000. Is a smaller gap good news if both groups are worse off?",
+    histNote: "This series begins in 1999, so there is no 1980 figure.",
+    src: [S.db549, S.odmort]},
+  {id: "depress", cat: "health", label: "Depression", title: "Major depressive episode in the past year, adults",
+    unit: "Percent of adults 18+", suf: "%", better: "lower",
+    vals: {latest: {w: 9.1, m: 5.7, year: "2025"}, c2000: null, c1980: null},
+    say: (w, m) => `${n1(w)}% of women and ${n1(m)}% of men had a major depressive episode in the past year.`,
+    note: "Women are more likely to report a major depressive episode. Researchers debate how much of this reflects real differences in depression and how much reflects differences in how women and men recognize, report and get diagnosed with it. Rates fell for both sexes from 2024 to 2025.",
+    ask: "Compare this row with the suicide row. Can both be accurate at the same time? How?",
+    histNote: "SAMHSA changed survey methods in 2020–21 and says earlier years aren't comparable.",
+    src: [S.nsduh]},
+  {id: "heart", cat: "health", extra: true, label: "Heart disease deaths", title: "Heart disease death rate",
+    unit: "Deaths per 100,000 people, age-adjusted", better: "lower",
+    vals: {latest: {w: 123.8, m: 197.7, year: "2024"}, c2000: {w: 210.9, m: 320.0, year: "2000"}, c1980: {w: 320.8, m: 538.9, year: "1980"}},
+    say: (w, m) => ratioSay(w, m, "heart disease death rate"),
+    note: "Heart disease death rates have fallen by more than half for both sexes since 1980, one of the great public health improvements of the period. Men's rate remains much higher.",
+    ask: "The gap's percentage barely changed, but far fewer people of both sexes die of heart disease. Which matters more for judging progress?",
+    src: [S.vsrr, S.slct]},
+  {id: "uninsured", cat: "health", extra: true, label: "No health insurance", title: "Uninsured adults, ages 18–64",
+    unit: "Percent without health insurance", suf: "%", better: "lower",
+    vals: {latest: {w: 10.4, m: 12.8, year: "2025"}, c2000: null, c1980: null},
+    say: (w, m) => `${n1(m)}% of men and ${n1(w)}% of women ages 18–64 have no health insurance.`,
+    note: "Men are a bit more likely to be uninsured. This gap is small compared with most others on the board.",
+    ask: "How might differences in insurance connect to the gaps in life expectancy?",
+    src: [S.nhis]},
+
+  /* ---------------- Safety & justice ---------------- */
+  {id: "homicide", cat: "safety", label: "Homicide victims", title: "Homicide death rate",
+    unit: "Deaths per 100,000 people, age-adjusted", better: "lower",
+    vals: {latest: {w: 2.5, m: 9.8, year: "2024"}, c2000: {w: 2.8, m: 9.0, year: "2000"}, c1980: {w: 4.4, m: 16.6, year: "1980"}},
+    say: (w, m) => ratioSay(w, m, "rate of being killed"),
+    note: "Men are about four times as likely as women to be killed. Most people who kill are also men: in 2025, men were 88% of homicide offenders whose sex was known. In 2019, the last year the FBI published this breakdown, 89% of male victims in one-victim, one-offender homicides were killed by other men. So men are both most of the offenders and most of the victims.",
+    ask: "If most violence against men comes from other men, how should that shape the way we think about “gender” and violence?",
+    src: [S.vsrr, S.slct, S.fbiShr, S.fbi19]},
+  {id: "violent", cat: "safety", label: "Violent crime victims", title: "Violent victimization (crime survey)",
+    unit: "Victimizations per 1,000 people age 12+ (rape, robbery, assault)", better: "lower",
+    vals: {latest: {w: 21.9, m: 24.7, year: "2024"}, c2000: {w: 31.6, m: 43.8, year: "2000"}, c1980: null},
+    say: (w, m) => `Men reported ${n1(m)} and women ${n1(w)} violent victimizations per 1,000 people.`,
+    note: "Treat this one as roughly even. In 2023 women's rate was higher; in 2024 men's was. The survey's margins of error overlap, and BJS doesn't say the 2024 difference is real. Rates have fallen a lot since 1993, when they were 96.9 for men and 63.7 for women on the same measure. The survey doesn't cover homicide.",
+    ask: "Homicide shows a huge gap, but this survey of non-fatal violence shows almost none. Which measure should count more?",
+    histNote: "BJS dashboard series for all years. The survey started its current design in 1993. BJS redesigned it again in 2025.",
+    src: [S.cv24, S.ndash]},
+  {id: "sexassault", cat: "safety", label: "Rape & sexual assault", title: "Rape and sexual assault victimization",
+    unit: "Victimizations per 1,000 people age 12+", better: "lower",
+    vals: {latest: {w: 3.2, m: 0.6, year: "2024"}, c2000: null, c1980: null},
+    say: (w, m) => `Women are about ${Math.round(w / (w + m) * 100)}% of rape and sexual assault victims in the crime survey.`,
+    note: "Women are the large majority of victims. The estimate for men rests on very few survey cases, so it's imprecise. Survey design matters a lot here. Federal surveys that ask about sexual violence in different ways produce very different estimates. In 1993, women's rate in the crime survey was 7.7 per 1,000.",
+    ask: "Why might survey wording change how many people report sexual violence, and would it change reports from men and women equally?",
+    histNote: "BJS flags the 2000 estimate for men as unreliable, so no 2000 comparison is shown.",
+    src: [S.ndash, S.cv24]},
+  {id: "ipv", cat: "safety", label: "Partner violence", title: "Intimate partner violence (crime survey)",
+    unit: "Victimizations by a current or former partner, per 1,000 people age 12+", better: "lower",
+    vals: {latest: {w: 4.2, m: 1.2, year: "2024"}, c2000: {w: 6.7, m: 1.1, year: "2000"}, c1980: null},
+    say: (w, m) => ratioSay(w, m, "rate of intimate partner violence"),
+    note: "Partners committed 19% of violent victimizations against women but 5% of those against men in 2024. CDC's survey finds that 29.9% of women and 13.0% of men have experienced partner violence with an impact, like fear or injury, in their lifetime. In CDC's 2016/17 survey, 13.9% of women and 4.3% of men had needed medical care after partner violence. Partner violence against women has fallen a lot: the rate was 15.5 per 1,000 in 1993.",
+    ask: "Men face more violence overall, but women face more violence at home. How does where violence happens change its meaning?",
+    src: [S.ndash, S.nisvs, S.nisvs17]},
+  {id: "iph", cat: "safety", extra: true, label: "Killed by a partner", title: "Intimate partner homicide",
+    unit: "Victims killed by an intimate partner, per 100,000 people", better: "lower",
+    vals: {latest: {w: 0.8, m: 0.5, year: "2025"}, c2000: null, c1980: null},
+    say: (w, m) => `Women are killed by partners at a higher rate than men (${n1(w)} vs. ${n1(m)} per 100,000).`,
+    note: "41% of women who were murdered in 2025 were killed by an intimate partner, compared with 7% of men who were murdered. Men are far more likely to be killed overall, but women are more likely to be killed by someone they're in a relationship with.",
+    ask: "This knot moves the opposite way from the homicide knot. What does that tell you about combining measures?",
+    src: [S.hvus]},
+  {id: "prison", cat: "safety", label: "In prison", title: "Imprisonment rate",
+    unit: "Sentenced prisoners per 100,000 residents", dp: 0, better: "lower",
+    vals: {latest: {w: 51, m: 676, year: "2023"}, c2000: {w: 59, m: 915, year: "2000"}, c1980: {w: 11, m: 274, year: "1980"}},
+    say: (w, m) => ratioSay(w, m, "imprisonment rate"),
+    note: "Men are about 13 times as likely as women to be in prison. Rates rose sharply for both from 1980 to 2000 and are lower today than in 2000. From 2013 to 2023, men's rate fell 25% and women's fell 22%. Counting less imprisonment as “better off” is itself a choice. Imprisonment reflects crime, but also policing, sentencing laws and poverty.",
+    ask: "Should a higher imprisonment rate count as a disadvantage for men, or as a result of men's own behavior? Can it be both?",
+    src: [S.p23, S.p00, S.p81]},
+  {id: "homeless", cat: "safety", label: "Homelessness", title: "People experiencing homelessness",
+    unit: "People counted on one night in January", dp: 0, better: "lower",
+    vals: {latest: {w: 302660, m: 459568, year: "2024"}, c2000: null, c1980: null},
+    say: (w, m) => `About 6 in 10 people experiencing homelessness are men or boys.`,
+    note: "In HUD's 2024 count, 59.6% of people experiencing homelessness were men or boys and 39.2% were women or girls. Others identified as transgender, nonbinary or another gender. Among people sleeping outside, 67% were men. HUD's 2025 report didn't break the count out by gender, which shows how the data available can change what we're able to see.",
+    ask: "Why might homelessness look so different for men and women, and why might women's homelessness be harder to count?",
+    histNote: "HUD changed its gender categories in 2024, so earlier counts aren't directly comparable.",
+    src: [S.ahar]},
+
+  /* ---------------- Power ---------------- */
+  {id: "congress", cat: "power", label: "Seats in Congress", title: "Share of seats in Congress",
+    unit: "Percent of the 535 seats in the House and Senate", suf: "%", better: "higher",
+    vals: {latest: {w: 28.2, m: 71.8, year: "2026"}, c2000: {w: 13.6, m: 86.4, year: "2001"}, c1980: {w: 4.0, m: 96.0, year: "1981"}},
+    say: (w, m) => `Women hold ${n1(w)}% of seats in Congress.`,
+    note: "Women held 4% of seats in Congress in 1981 and hold about 28% now. That is a large increase, but still far from half. Women hold 33.5% of state legislative seats.",
+    ask: "Does it matter for everyone else who holds power? What would you expect to change if Congress were half women?",
+    histNote: "Current figure read from CAWP on Oct. 31, 2026; it changes with vacancies and special elections.",
+    src: [S.cawp]},
+  {id: "stateleg", cat: "power", extra: true, label: "State legislators", title: "Share of state legislative seats",
+    unit: "Percent of 7,386 state legislative seats", suf: "%", better: "higher",
+    vals: {latest: {w: 33.5, m: 66.5, year: "2026"}, c2000: {w: 22.4, m: 77.6, year: "2001"}, c1980: {w: 12.0, m: 88.0, year: "1981"}},
+    say: (w, m) => `Women hold ${n1(w)}% of state legislative seats.`,
+    note: "Women's share of state legislative seats has nearly tripled since 1981. State legislatures are often where future members of Congress start.",
+    ask: "Women do better in state legislatures than in Congress. Why might representation differ by level of government?",
+    src: [S.cawp]},
+  {id: "ceo", cat: "power", label: "Fortune 500 CEOs", title: "Fortune 500 CEOs",
+    unit: "Percent of Fortune 500 chief executives", suf: "%", better: "higher",
+    vals: {latest: {w: 11.2, m: 88.8, year: "2026"}, c2000: {w: 0.4, m: 99.6, year: "2000"}, c1980: null},
+    say: (w, m) => `${Math.round(w * 5)} of 500 Fortune 500 CEOs are women (${n1(w)}%).`,
+    note: "In 2000, two Fortune 500 companies had women CEOs. In 2026 a record 56 do. That is a big change, but men still run almost 9 in 10 of the largest companies.",
+    ask: "Women earn most college degrees but run about 1 in 9 big companies. Where along the way does the gap open up?",
+    src: [S.fortune, S.catalyst]},
+
+  /* ---------------- Time ---------------- */
+  {id: "housework", cat: "time", label: "Housework", title: "Time spent on household activities",
+    unit: "Average hours per day, everyone 15+", dp: 2, suf: " hrs", better: "ambiguous",
+    dirq: "Is doing more housework a burden? Many sociologists see the unequal split as a “second shift” for women. Others note that time at home isn't all drudgery.",
+    vals: {latest: {w: 2.38, m: 1.58, year: "2025"}, c2000: {w: 2.30, m: 1.33, year: "2003"}, c1980: null},
+    say: (w, m) => `Women spend about ${Math.round((w - m) * 60)} more minutes a day than men on housework, cooking and other household tasks.`,
+    note: "Women still do more unpaid household work, but men's time has risen since the survey began in 2003. In 2025, 48% of women and 24% of men did some housework (cleaning, laundry) on an average day.",
+    ask: "Should unpaid work at home count when we compare men's and women's earnings?",
+    histNote: "The American Time Use Survey began in 2003. 2025 data collection was paused during the federal shutdown.",
+    src: [S.atus, S.atus03]},
+  {id: "care", cat: "time", extra: true, label: "Caring for family", title: "Time caring for household members",
+    unit: "Average hours per day, everyone 15+", dp: 2, suf: " hrs", better: "ambiguous",
+    dirq: "Is more caregiving time a burden, a source of meaning, or both?",
+    vals: {latest: {w: 0.61, m: 0.36, year: "2025"}, c2000: {w: 0.75, m: 0.34, year: "2003"}, c1980: null},
+    say: (w, m) => `Women spend about ${Math.round((w - m) * 60)} more minutes a day caring for household members.`,
+    note: "This includes caring for children and adults who live in the same household. The gap has narrowed since 2003, mostly because women's time went down.",
+    ask: "If care work is valuable, why is it usually unpaid when it's done at home and poorly paid when it's a job?",
+    src: [S.atus, S.atus03]},
+  {id: "leisure", cat: "time", label: "Leisure time", title: "Time for leisure and sports",
+    unit: "Average hours per day, everyone 15+", dp: 2, suf: " hrs", better: "higher",
+    vals: {latest: {w: 4.76, m: 5.58, year: "2025"}, c2000: {w: 4.83, m: 5.41, year: "2003"}, c1980: null},
+    say: (w, m) => `Men get about ${Math.round((m - w) * 60)} more minutes of leisure a day than women.`,
+    note: "Leisure here means time for TV, socializing, exercise, hobbies and similar activities. Men's extra leisure is roughly the size of women's extra housework.",
+    ask: "Is free time a fair way to measure well-being? What would you add to this board that isn't on it?",
+    src: [S.atus, S.atus03]}
+];
+/* DATA:END */
+
+const state = {
+  era: "latest", set: "core", pred: null, cap: "none", weighting: false,
+  revealed: new Set(), open: new Set(), selected: null, weights: {}, dirChoice: {}
+};
+try { const s = JSON.parse(localStorage.getItem("eow-state") || "null"); if (s && s.dirChoice) state.dirChoice = s.dirChoice; } catch (e) {}
+function persist(){ try { localStorage.setItem("eow-state", JSON.stringify({dirChoice: state.dirChoice})); } catch (e) {} }
+
+
+function visible(){ return DATA.filter(d => !d.extra || state.open.has(d.cat)); }
+function dirOf(d){ return d.better === "ambiguous" ? (state.dirChoice[d.id] || "none") : d.better; }
+
+/* signed score: + women fare better, - men fare better, magnitude 0..1; null = no data */
+function score(d, era){
+  const v = d.vals[era || state.era];
+  if (!v || v.w == null || v.m == null) return null;
+  let gap, womenHigher = v.w > v.m;
+  if (d.kind === "sd") gap = Math.min(1, Math.abs(v.w - v.m) / (v.sd || d.sd));
+  else { const hi = Math.max(v.w, v.m), lo = Math.min(v.w, v.m); gap = hi === 0 ? 0 : 1 - lo / hi; }
+  const dir = dirOf(d);
+  if (dir === "none") return { gap, sign: 0, womenHigher };
+  const womenBetter = dir === "higher" ? womenHigher : !womenHigher;
+  if (v.w === v.m) return { gap: 0, sign: 0, womenHigher };
+  return { gap, sign: womenBetter ? 1 : -1, womenHigher };
+}
+
+function fmt(d, x){
+  if (x == null) return "—";
+  const dp = d.dp ?? 1;
+  return (d.pre || "") + x.toLocaleString("en-US", {minimumFractionDigits: dp, maximumFractionDigits: dp}) + (d.suf || "");
+}
+function pct(g){ return Math.round(g * 100) + "%"; }
+function gl(d, g){ return d.kind === "sd" ? g.toFixed(2) + " SD" : pct(g); }
+
+/* ---------- render board ---------- */
+const board = document.getElementById("board");
+const EMPTY = `<p class="empty">Tap any row to see the numbers behind it.</p>`;
+function buildBoard(){
+  board.innerHTML = "";
+  const vis = visible();
+  CATS.forEach(cat => {
+    const items = vis.filter(d => d.cat === cat.id);
+    const nExtra = DATA.filter(d => d.cat === cat.id && d.extra).length;
+    if (!items.length) return;
+    const isOpen = state.open.has(cat.id);
+    const p = document.createElement("section");
+    p.className = "panel"; p.dataset.cat = cat.id;
+    p.innerHTML = `<div class="phead"><h2>${cat.name}</h2>${nExtra ? `<button type="button" class="more-btn" aria-expanded="${isOpen}">${isOpen ? "Show fewer" : `+ ${nExtra} more measure${nExtra > 1 ? "s" : ""}`}</button>` : ""}</div><div class="rows"></div>`;
+    const rows = p.querySelector(".rows");
+    const mb = p.querySelector(".more-btn");
+    if (mb) mb.addEventListener("click", () => {
+      if (state.open.has(cat.id)) {
+        state.open.delete(cat.id);
+        const sel = DATA.find(x => x.id === state.selected);
+        if (sel && sel.extra && sel.cat === cat.id) { state.selected = null; detail.innerHTML = EMPTY; }
+      } else state.open.add(cat.id);
+      syncOpenAll(); buildBoard(); update();
+      const again = board.querySelector(`.panel[data-cat="${cat.id}"] .more-btn`); if (again) again.focus();
+    });
+    items.forEach(d => {
+      const r = document.createElement("div");
+      r.className = "row" + (d.extra ? " extra" : ""); r.dataset.id = d.id;
+      r.innerHTML = `<button type="button" class="rbtn">
+          <span class="rlabel">${d.label}</span>
+          <span class="track" aria-hidden="true"><span class="rope"></span><span class="mid"></span><span class="pull"></span><span class="knot"><span class="qm">?</span></span></span>
+          <span class="rtext"></span>
+        </button>${state.weighting ? `<button type="button" class="wt"></button>` : ""}`;
+      r.querySelector(".rbtn").addEventListener("click", () => {
+        state.revealed.add(d.id); state.selected = d.id; update(); showDetail(true);
+      });
+      const wt = r.querySelector(".wt");
+      if (wt) wt.addEventListener("click", () => cycleWeight(d.id));
+      rows.appendChild(r);
+    });
+    board.appendChild(p);
+  });
+}
+function cycleWeight(id){ const w = state.weights[id] ?? 1; state.weights[id] = (w + 1) % 4; update(); }
+
+function update(){
+  const vis = visible();
+  document.querySelectorAll(".row").forEach(el => {
+    const d = DATA.find(x => x.id === el.dataset.id);
+    const s = score(d);
+    const shown = state.revealed.has(d.id);
+    const knot = el.querySelector(".knot"), pull = el.querySelector(".pull"), txt = el.querySelector(".rtext"), btn = el.querySelector(".rbtn");
+    el.classList.toggle("sel", state.selected === d.id);
+    btn.setAttribute("aria-pressed", state.selected === d.id ? "true" : "false");
+    el.classList.toggle("hidden", !shown);
+    el.classList.remove("w", "m", "n", "nodata");
+    let pos = 0; // -1 (men side) .. +1 (women side)
+    if (!shown) { txt.textContent = "Tap to reveal"; }
+    else if (s === null) { el.classList.add("nodata"); txt.textContent = "No comparable figure for this period."; }
+    else {
+      const v = d.vals[state.era];
+      txt.textContent = d.say(v.w, v.m) + (s.sign === 0 ? " Which way is better? Open it and decide." : "");
+      if (s.sign === 0) el.classList.add("n");
+      else { el.classList.add(s.sign > 0 ? "w" : "m"); pos = s.sign * Math.max(s.gap, 0.015); }
+    }
+    knot.style.left = (50 + pos * 46) + "%";
+    pull.style.left = (pos < 0 ? 50 + pos * 46 : 50) + "%";
+    pull.style.width = Math.abs(pos * 46) + "%";
+    const w = el.querySelector(".wt");
+    if (w){ const wv = state.weights[d.id] ?? 1; w.dataset.w = wv; w.textContent = "×" + wv; w.setAttribute("aria-label", `Weight for ${d.label}: ${wv}. Press to change.`); w.title = "How much this measure counts in your index"; }
+    const desc = !shown ? "hidden, press to reveal" : s === null ? "no comparable data for this year" : (s.sign > 0 ? "women fare better" : s.sign < 0 ? "men fare better" : "no direction chosen") + `, gap ${gl(d, s.gap)}`;
+    btn.setAttribute("aria-label", `${d.label}: ${desc}`);
+  });
+  // tally + index
+  let nW = 0, nM = 0, nH = 0, num = 0, den = 0;
+  vis.forEach(d => {
+    if (!state.revealed.has(d.id)) { nH++; return; }
+    const s = score(d); if (!s) return;
+    if (s.sign > 0 && s.gap >= 0.005) nW++;
+    if (s.sign < 0 && s.gap >= 0.005) nM++;
+    if (s.sign === 0) return;
+    const w = state.weighting ? (state.weights[d.id] ?? 1) : 1;
+    let v = s.sign * s.gap;
+    if (state.cap === "women" && v > 0) v = 0;   // like the WEF cap: women's advantages don't count
+    if (state.cap === "men" && v < 0) v = 0;
+    num += w * v; den += w;
+  });
+  document.getElementById("nW").textContent = nW;
+  document.getElementById("nM").textContent = nM;
+  document.getElementById("nH").textContent = nH;
+  const po = document.getElementById("predOut");
+  if (state.pred && nH === 0 && vis.length){
+    const lab = {women: "women fare better", men: "men fare better", even: "about even"}[state.pred];
+    const idx = den ? num / den : 0, pts = Math.abs(idx * 100);
+    const lean = !den ? "has no rows with a direction yet" : pts < 1.5 ? "comes out about even" : `leans toward ${idx > 0 ? "women" : "men"} faring better`;
+    po.textContent = `You predicted “${lab}.” The rows split ${nW} for women and ${nM} for men, and your index ${lean}. Now change the year, the measures or the weights and see how the answer moves.`;
+  } else if (state.pred) po.textContent = `Your prediction: ${ {women: "women fare better", men: "men fare better", even: "about even"}[state.pred] }. Reveal the rows to check it.`;
+  else po.textContent = "";
+  const needle = document.getElementById("needle"), verdict = document.getElementById("verdict");
+  if (!den){ needle.style.left = "50%"; verdict.textContent = state.revealed.size ? "No rows with a direction yet" : "Nothing revealed yet"; }
+  else {
+    const idx = num / den; // -1..1
+    needle.style.left = (50 + idx * 50 * 2.2 > 98 ? 98 : 50 + idx * 50 * 2.2 < 2 ? 2 : 50 + idx * 50 * 2.2) + "%";
+    const pts = Math.abs(idx * 100);
+    verdict.textContent = pts < 1.5 ? "About even" : (idx > 0 ? "Leans women: +" : "Leans men: −") + pts.toFixed(1) + " pts";
+  }
+  document.getElementById("capNote").textContent = {
+    none: "Every revealed row counts. Gaps favoring women and gaps favoring men can offset each other.",
+    women: "Rows where women come out ahead count as zero, so the index can only lean toward men. This is roughly how the World Economic Forum's Global Gender Gap Index works.",
+    men: "The mirror image: rows where men come out ahead count as zero, so the index can only lean toward women. Same data, opposite rule."
+  }[state.cap];
+  if (state.selected) showDetail(false);
+}
+
+/* ---------- detail ---------- */
+const detail = document.getElementById("detail");
+function showDetail(scroll){
+  const d = DATA.find(x => x.id === state.selected); if (!d) return;
+  const cat = CATS.find(c => c.id === d.cat);
+  const v = d.vals[state.era]; const s = score(d);
+  const max = v ? Math.max(v.w ?? 0, v.m ?? 0) * (d.kind === "sd" ? 1.0 : 1) : 0;
+  const base = d.kind === "sd" ? (d.axisMin ?? 0) : 0;
+  const wpct = v && v.w != null ? ((v.w - base) / (max - base || 1)) * 100 : 0;
+  const mpct = v && v.m != null ? ((v.m - base) / (max - base || 1)) * 100 : 0;
+  const head = v && v.w != null ? d.say(v.w, v.m) : "No comparable figure in this series for this period.";
+  const eras = [["c1980", "Around 1980"], ["c2000", "Around 2000"], ["latest", "Latest"]];
+  const rows = eras.map(([k, lab]) => {
+    const x = d.vals[k]; const sc = score(d, k);
+    if (!x || x.w == null) return `<tr><td>${lab}</td><td colspan="4" style="text-align:left;color:var(--faint)">no comparable data</td></tr>`;
+    const who = !sc || sc.sign === 0 ? "—" : sc.sign > 0 ? "women" : "men";
+    return `<tr${k === state.era ? ' style="font-weight:700"' : ""}><td>${lab} (${x.year})</td><td>${fmt(d, x.w)}</td><td>${fmt(d, x.m)}</td><td>${gl(d, sc.gap)}</td><td>${who}</td></tr>`;
+  }).join("");
+  const dirUI = d.better === "ambiguous" ? `<div class="dirpick"><strong>Which way is “better” here?</strong> ${d.dirq || ""}
+      <div><div class="seg" id="dirSeg">
+        <button type="button" data-dir="higher" aria-pressed="${dirOf(d) === "higher"}">Higher is better</button>
+        <button type="button" data-dir="lower" aria-pressed="${dirOf(d) === "lower"}">Lower is better</button>
+        <button type="button" data-dir="none" aria-pressed="${dirOf(d) === "none"}">Neither</button>
+      </div></div></div>` : "";
+  detail.innerHTML = `
+    <div class="cat">${cat.name}${d.extra ? " · extra measure" : ""}</div>
+    <h3>${d.title}</h3>
+    <p class="headline">${head}</p>
+    <div class="dgrid">
+      <div>
+        <div class="pair">
+          <span class="who">Women</span><span class="rail"><span class="fill" style="width:${wpct}%;background:var(--women)"></span></span><span class="num">${v ? fmt(d, v.w) : "—"}</span>
+          <span class="who">Men</span><span class="rail"><span class="fill" style="width:${mpct}%;background:var(--men)"></span></span><span class="num">${v ? fmt(d, v.m) : "—"}</span>
+        </div>
+        <div class="unit">${d.unit}${v && v.year ? " · " + v.year : ""}${s ? " · gap " + gl(d, s.gap) : ""}</div>
+        <div class="hist"><h4>Over time</h4>
+          <table><thead><tr><th>Period</th><th>Women</th><th>Men</th><th>Gap</th><th>Better off</th></tr></thead><tbody>${rows}</tbody></table>
+          ${d.histNote ? `<div class="unit">${d.histNote}</div>` : ""}
+        </div>
+      </div>
+      <div class="dtext">
+        ${dirUI}
+        <h4>What’s behind it</h4><p>${d.note}</p>
+        <h4>Ask</h4><p class="ask">${d.ask}</p>
+        <p class="src">Source: ${d.src.map(x => `<a href="${x.url}" target="_blank" rel="noopener">${x.name}</a>`).join("; ")}</p>
+      </div>
+    </div>`;
+  const ds = document.getElementById("dirSeg");
+  if (ds) ds.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+    state.dirChoice[d.id] = btn.dataset.dir; persist(); update();
+  }));
+  if (scroll){
+    const r = detail.getBoundingClientRect();
+    if (r.top > window.innerHeight - 120) detail.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
+  }
+}
+
+/* ---------- table ---------- */
+function buildTable(){
+  const t = document.getElementById("dataTable");
+  const eraName = {c1980: "c. 1980", c2000: "c. 2000", latest: "Latest"};
+  let h = `<thead><tr><th>Measure</th><th>Period (year)</th><th>Women</th><th>Men</th><th>Gap</th><th>Better off</th><th>Source</th></tr></thead><tbody>`;
+  DATA.forEach(d => ["c1980", "c2000", "latest"].forEach((k, i) => {
+    const x = d.vals[k]; if (!x || x.w == null) return;
+    const sc = score(d, k);
+    const who = d.better === "ambiguous" ? "you decide" : sc.sign > 0 ? "women" : sc.sign < 0 ? "men" : "—";
+    h += `<tr><td>${i === 2 || !d.vals.latest ? `<strong>${d.title}</strong><br><span style="color:var(--muted)">${d.unit}</span>` : d.title}</td><td>${eraName[k]} (${x.year})</td><td class="n">${fmt(d, x.w)}</td><td class="n">${fmt(d, x.m)}</td><td class="n">${gl(d, sc.gap)}</td><td>${who}</td><td>${(x.src || d.src).map ? (x.src || d.src).map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.name}</a>`).join("; ") : ""}</td></tr>`;
+  }));
+  t.innerHTML = h + "</tbody>";
+}
+
+/* ---------- controls ---------- */
+function segBind(id, key, after){
+  const seg = document.getElementById(id);
+  seg.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    state[key] = b.dataset[key];
+    seg.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    (after || update)();
+  }));
+}
+segBind("eraSeg", "era");
+segBind("predSeg", "pred");
+function syncOpenAll(){
+  const all = CATS.every(c => !DATA.some(d => d.cat === c.id && d.extra) || state.open.has(c.id));
+  const b = document.getElementById("openAll"); b.setAttribute("aria-pressed", all); b.textContent = all ? "Close extra measures" : "Open every panel";
+}
+document.getElementById("openAll").addEventListener("click", () => {
+  const all = document.getElementById("openAll").getAttribute("aria-pressed") === "true";
+  if (all) { state.open.clear(); if (state.selected && DATA.find(x => x.id === state.selected).extra) { state.selected = null; detail.innerHTML = EMPTY; } }
+  else CATS.forEach(c => state.open.add(c.id));
+  syncOpenAll(); buildBoard(); update();
+});
+segBind("capSeg", "cap");
+document.getElementById("weightBtn").addEventListener("click", e => {
+  state.weighting = !state.weighting; e.currentTarget.setAttribute("aria-pressed", state.weighting);
+  e.currentTarget.classList.toggle("primary", state.weighting);
+  buildBoard(); update();
+});
+document.getElementById("revealAll").addEventListener("click", () => {
+  const vis = visible(); let i = 0;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce){ vis.forEach(d => state.revealed.add(d.id)); update(); return; }
+  (function step(){ if (i >= vis.length) return; state.revealed.add(vis[i++].id); update(); setTimeout(step, 90); })();
+});
+document.getElementById("resetAll").addEventListener("click", () => {
+  state.revealed.clear(); state.selected = null; update();
+  detail.innerHTML = EMPTY;
+});
+
+document.getElementById("foot").innerHTML = `Created by Gwen Sharp (<a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a>). Data compiled ${AS_OF} from U.S. federal statistical agencies and other primary sources listed above. Figures are national averages for women and men as reported by each source; most federal surveys report sex as female/male.`;
+const toTop = document.getElementById("toTop");
+function onScroll(){ toTop.hidden = window.scrollY < 700; }
+window.addEventListener("scroll", onScroll, {passive: true}); onScroll();
+toTop.addEventListener("click", () => { window.scrollTo({top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); document.getElementById("predSeg").querySelector("button").focus({preventScroll: true}); });
+buildBoard(); update(); buildTable();
+</script>
+
+</body>
+</html>
