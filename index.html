@@ -862,7 +862,7 @@ document.getElementById("resetAll").addEventListener("click", () => {
   detail.innerHTML = EMPTY;
 });
 
-document.getElementById("foot").innerHTML = `Created by Gwen Sharp (<a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a>). Data compiled ${AS_OF} from U.S. federal statistical agencies and other primary sources listed above. Figures are national averages for women and men as reported by each source; most federal surveys report sex as female/male.`;
+document.getElementById("foot").innerHTML = `Created by Gwen Sharp (<a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a>). Data compiled ${AS_OF} from U.S. federal statistical agencies and other primary sources listed above. Figures are national averages for women and men as reported by each source; most federal surveys report sex as female/male. Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>.`;
 const toTop = document.getElementById("toTop");
 function onScroll(){ toTop.hidden = window.scrollY < 700; }
 window.addEventListener("scroll", onScroll, {passive: true}); onScroll();

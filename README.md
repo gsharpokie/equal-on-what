@@ -19,3 +19,7 @@ All figures come from U.S. federal statistical agencies and other primary source
 ## Author
 
 Created by Gwen Sharp ([@gsharpokie](https://x.com/gsharpokie)).
+
+## License
+
+© 2026 Gwen Sharp. Licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): you may share and adapt it for noncommercial purposes with credit. See [LICENSE](LICENSE).
