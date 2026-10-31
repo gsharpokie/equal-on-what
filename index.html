@@ -119,7 +119,9 @@ h1 .q{color:var(--women)} h1 .q2{color:var(--men)}
 .more-link{color:var(--muted);font-weight:600;white-space:nowrap}
 .rbtn:hover .more-link{color:var(--ink);text-decoration:underline}
 @media (max-width:560px){ .rbtn{grid-template-columns:minmax(0,1fr);grid-template-areas:"lab" "track" "text";row-gap:4px} }
-.wt{flex:0 0 auto;font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:12px;padding:3px 0;width:40px;background:var(--bg);cursor:pointer}
+.wt{flex:0 0 auto;display:grid;justify-items:center;gap:1px;font-family:var(--mono);font-size:13px;font-weight:500;line-height:1.1;border:1px solid var(--line);border-radius:8px;padding:4px 0 5px;width:58px;background:var(--bg);cursor:pointer}
+.wt .wl{font-size:9px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wt[data-w="2"] .wl,.wt[data-w="3"] .wl{color:inherit;opacity:.8}
 .wt:hover{border-color:var(--muted)}
 .wt[data-w="0"]{color:var(--faint);text-decoration:line-through}
 .wt[data-w="2"],.wt[data-w="3"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -182,6 +184,7 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
     <div class="eyebrow">Gender &amp; inequality · United States · By Gwen Sharp · <a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a></div>
     <h1>Equal <span class="q">on</span> <span class="q2">what?</span></h1>
     <p class="lede">Is the U.S. gender-equal? It depends on what you measure. Each row below is one part of life, set up like a tug-of-war. The knot starts in the middle at <strong>even</strong>. Tap a row and the knot moves toward whoever comes out ahead.</p>
+    <p class="lede" style="margin-top:10px;color:var(--muted);font-size:16px">Think some things matter more than others? Use the <strong style="color:var(--ink)">weight</strong> button on each row to make it count double, triple, or not at all. The overall balance at the top updates as you go.</p>
   </header>
 
   <div class="predict">
@@ -705,7 +708,7 @@ function update(){
     pull.style.left = (pos < 0 ? 50 + pos * 47 : 50) + "%";
     pull.style.width = Math.abs(pos * 47) + "%";
     const w = el.querySelector(".wt"), wv = state.weights[d.id] ?? 1;
-    w.dataset.w = wv; w.textContent = "×" + wv; w.setAttribute("aria-label", `Weight for ${d.label}: ×${wv}. Press to change.`);
+    w.dataset.w = wv; w.innerHTML = `<span class="wl">weight</span>×${wv}`; w.setAttribute("aria-label", `Weight for ${d.label}: ×${wv}. Press to change.`);
     const desc = !shown ? "hidden, press to reveal" : s === null ? "no comparable data for this year" : (s.sign > 0 ? "women fare better" : s.sign < 0 ? "men fare better" : "no direction chosen") + `, gap ${gl(d, s.gap)}. Press for details`;
     btn.setAttribute("aria-label", `${d.label}: ${desc}`);
   });
