@@ -11,52 +11,51 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a tug-of-war board. Category panels hold rows; each row's knot starts at "even" and is pulled toward the group that fares better. A sticky key names the two sides. Detail and index read-outs sit beneath. */
+/* Layout: a tug-of-war board. A pinned band at the top shows the overall balance and names the two sides. Category panels hold rows; each row's knot starts at "even" and is pulled toward the group that fares better. Details slide in from the right. */
 :root{
   --bg:#f3f4f6; --surface:#ffffff; --ink:#14171b; --muted:#59626d; --faint:#8a929c; --line:#d8dce1; --grid:#eceef1;
-  --women:#c4570f; --men:#2b63b9; --neutral:#9aa1aa; --women-soft:#c4570f22; --men-soft:#2b63b922;
-  --focus:#14171b; --on-accent:#ffffff;
+  --women:#7a4fd0; --men:#008a7e; --neutral:#9aa1aa; --women-soft:#7a4fd01c; --men-soft:#008a7e1c;
+  --focus:#14171b; --scrim:#14171b55; --tipbg:#14171b; --tipfg:#ffffff;
   --display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121418; --surface:#1b1e23; --ink:#eceef1; --muted:#a3abb5; --faint:#78818c; --line:#30353c; --grid:#24282e;
-  --women:#d9702a; --men:#5a8ee6; --neutral:#7d8590; --women-soft:#d9702a2e; --men-soft:#5a8ee62e; --focus:#eceef1; --on-accent:#0f1114; color-scheme:dark}}
+  --women:#a07ee6; --men:#2aa198; --neutral:#7d8590; --women-soft:#a07ee624; --men-soft:#2aa19824;
+  --focus:#eceef1; --scrim:#00000088; --tipbg:#eceef1; --tipfg:#14171b; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#121418; --surface:#1b1e23; --ink:#eceef1; --muted:#a3abb5; --faint:#78818c; --line:#30353c; --grid:#24282e;
-  --women:#d9702a; --men:#5a8ee6; --neutral:#7d8590; --women-soft:#d9702a2e; --men-soft:#5a8ee62e; --focus:#eceef1; --on-accent:#0f1114; color-scheme:dark}
+  --women:#a07ee6; --men:#2aa198; --neutral:#7d8590; --women-soft:#a07ee624; --men-soft:#2aa19824;
+  --focus:#eceef1; --scrim:#00000088; --tipbg:#eceef1; --tipfg:#14171b; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body.locked{overflow:hidden}
 .wrap{max-width:1160px;margin:0 auto;padding-block:40px 72px}
 a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
 /* ---------- header ---------- */
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 h1{font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:.86;letter-spacing:.005em;
   font-size:clamp(56px,11vw,128px);margin:10px 0 18px;text-wrap:balance}
-h1 .q{display:inline-block;color:var(--women)}
-h1 .q2{color:var(--men)}
-.lede{max-width:64ch;font-size:clamp(17px,2vw,19px);color:var(--ink);margin:0}
-.lede + .lede{margin-top:10px;color:var(--muted);font-size:16px}
+h1 .q{color:var(--women)} h1 .q2{color:var(--men)}
+.lede{max-width:64ch;font-size:clamp(17px,2vw,19px);margin:0}
 
 /* ---------- prediction ---------- */
-.predict{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:26px;padding:12px 14px;border:1px dashed var(--muted);border-radius:8px}
-.predict .lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.predict{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:24px;padding:12px 14px;border:1px dashed var(--muted);border-radius:8px}
 .predict .pq{font-weight:600;min-width:0}
-.predict .pout{flex:1 1 100%;font-size:15px;color:var(--ink)}
+.predict .pout{flex:1 1 100%;font-size:15px}
 .predict .pout:empty{display:none}
 
 /* ---------- controls ---------- */
-.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:28px 0 14px;
-  padding-block:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ctl > .lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:22px 0 0;padding-block:12px;border-top:1px solid var(--line)}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
 .seg button{border:0;background:transparent;padding:6px 11px;font-size:14px;cursor:pointer;color:var(--muted)}
 .seg button + button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
@@ -65,59 +64,48 @@ h1 .q2{color:var(--men)}
 .btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .spacer{flex:1 1 auto}
 
-/* ---------- scoreboard ---------- */
-.score{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
-@media (max-width:760px){.score{grid-template-columns:minmax(0,1fr)}}
-.tally{display:flex;gap:10px;flex-wrap:wrap}
-.tile{flex:1 1 120px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-width:0}
-.tile .n{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
-.tile .t{font-size:13px;color:var(--muted);line-height:1.3;margin-top:4px}
-.tile.w .n{color:var(--women)} .tile.m .n{color:var(--men)}
-.meter{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px 12px;min-width:0}
-.meter .head{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
-.meter .title{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.meter .verdict{font-weight:700;font-size:15px}
-.mtrack{position:relative;height:26px;margin:12px 0 4px;border-radius:13px;
-  background:linear-gradient(90deg,var(--men-soft),transparent 50%,var(--women-soft))}
-.mtrack::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--muted)}
-.needle{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid var(--surface);
-  transform:translate(-50%,-50%);left:50%;transition:left .8s cubic-bezier(.2,.8,.2,1)}
-.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-
-/* ---------- key (sticky) ---------- */
-.key{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;margin:6px 0 10px;background:var(--bg);padding-block:8px}
-.keybar{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
-.keybar > span{padding:9px 12px;font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.03em;font-size:clamp(15px,2.4vw,20px);line-height:1.05;display:flex;align-items:center;gap:8px}
-.keybar .km{background:var(--men);color:var(--on-accent);justify-content:flex-start}
-.keybar .kw{background:var(--women);color:var(--on-accent);justify-content:flex-end;text-align:right}
-.keybar .ke{background:var(--surface);color:var(--muted);font-size:13px;font-family:var(--mono);font-weight:500;padding-inline:10px;justify-content:center}
-.keynote{font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
+/* ---------- pinned balance band ---------- */
+.band{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:var(--bg);padding-block:10px 10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.bandbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"m rail w";align-items:center;gap:12px}
+.bm,.bw{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.03em;font-size:clamp(16px,2.3vw,21px);line-height:1;white-space:nowrap}
+.bm{grid-area:m;color:var(--men)} .bw{grid-area:w;color:var(--women);text-align:right}
+.brail{grid-area:rail;position:relative;height:30px}
+.brail::before{content:"";position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;border-radius:3px;background:linear-gradient(90deg,var(--men),var(--line) 50%,var(--women));opacity:.35}
+.bmid{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--muted)}
+.bknot{position:absolute;top:50%;left:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--ink);border:4px solid var(--bg);box-shadow:0 0 0 1px var(--ink);
+  transition:left .9s cubic-bezier(.2,.8,.2,1),background-color .3s,box-shadow .3s}
+.bknot.w{background:var(--women);box-shadow:0 0 0 1px var(--women)} .bknot.m{background:var(--men);box-shadow:0 0 0 1px var(--men)}
+.bknot.bump{animation:bump .5s ease}
+@keyframes bump{40%{transform:scale(1.25)}}
+.bandtext{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 14px;font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
+.bandtext strong{color:var(--ink)}
+.bandtext .cw{color:var(--women);font-weight:700} .bandtext .cm{color:var(--men);font-weight:700}
+@media (max-width:620px){
+  .bandbar{grid-template-columns:1fr 1fr;grid-template-areas:"m w" "rail rail";row-gap:4px}
+}
 
 /* ---------- board ---------- */
-.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:12px;align-items:start}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 12px 6px;min-width:0}
-.phead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:12px;align-items:start;margin-top:8px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 10px 6px 12px;min-width:0}
+.phead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:2px;flex-wrap:wrap}
 .panel h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:22px;letter-spacing:.03em;margin:0;line-height:1}
-.more-btn{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:3px 11px;font-size:12px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.more-btn{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:3px 11px;font-size:12px;cursor:pointer;white-space:nowrap}
 .more-btn:hover{border-color:var(--muted)}
 .rows{display:flex;flex-direction:column}
-.row{display:flex;align-items:stretch;gap:6px;border-top:1px solid var(--grid)}
+.row{display:flex;align-items:center;gap:4px;border-top:1px solid var(--grid)}
 .row:first-child{border-top:0}
-.rbtn{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);grid-template-areas:"lab track" "lab text";column-gap:12px;row-gap:2px;align-items:center;
+.rbtn{flex:1 1 auto;min-width:0;display:grid;grid-template-columns:minmax(0,140px) minmax(0,1fr);grid-template-areas:"lab track" "lab text";column-gap:12px;row-gap:2px;align-items:center;
   text-align:left;border:0;background:transparent;padding:10px 6px;border-radius:6px;cursor:pointer}
 .rbtn:hover{background:var(--grid)}
 .row.sel .rbtn{background:var(--grid)}
-.rlabel{grid-area:lab;font-weight:600;font-size:14px;line-height:1.25;align-self:start;padding-top:2px}
-.row.extra .rlabel::after{content:"extra";display:inline-block;margin-left:6px;font-family:var(--mono);font-size:10px;font-weight:400;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;vertical-align:1px}
-.track{grid-area:track;position:relative;height:26px;border-radius:13px;background:linear-gradient(90deg,var(--men-soft),transparent 50%,var(--women-soft))}
-.rope{position:absolute;left:4%;right:4%;top:50%;height:2px;margin-top:-1px;background:var(--line);border-radius:1px}
-.rope::before,.rope::after{content:"";position:absolute;top:-4px;width:2px;height:10px;background:var(--line)}
-.rope::before{left:0;background:var(--men);opacity:.6}.rope::after{right:0;background:var(--women);opacity:.6}
-.mid{position:absolute;left:50%;top:2px;bottom:2px;width:2px;margin-left:-1px;background:var(--muted)}
+.rlabel{grid-area:lab;font-weight:600;font-size:14px;line-height:1.25;align-self:start;padding-top:3px}
+.track{grid-area:track;position:relative;height:24px}
+.rope{position:absolute;left:3%;right:3%;top:50%;height:2px;margin-top:-1px;background:var(--line);border-radius:1px}
+.mid{position:absolute;left:50%;top:3px;bottom:3px;width:2px;margin-left:-1px;background:var(--muted)}
 .pull{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:2px;width:0;left:50%;transition:left .8s cubic-bezier(.2,.8,.2,1),width .8s cubic-bezier(.2,.8,.2,1)}
-.knot{position:absolute;top:50%;left:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--surface);border:2px dashed var(--muted);
+.knot{position:absolute;top:50%;left:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--surface);border:2px dashed var(--muted);
   display:grid;place-items:center;transition:left .8s cubic-bezier(.2,.8,.2,1),background-color .3s,border-color .3s;z-index:2}
-.qm{font-family:var(--display);font-weight:800;font-size:13px;color:var(--muted);line-height:1}
+.qm{font-family:var(--display);font-weight:800;font-size:12px;color:var(--muted);line-height:1}
 .row:not(.hidden) .qm{display:none}
 .row.w .knot{background:var(--women);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--women)}
 .row.m .knot{background:var(--men);border:3px solid var(--surface);box-shadow:0 0 0 1px var(--men)}
@@ -128,41 +116,42 @@ h1 .q2{color:var(--men)}
 .rtext{grid-area:text;font-size:13px;line-height:1.35;color:var(--muted);min-height:1.35em}
 .row.hidden .rtext{font-style:italic;color:var(--faint)}
 .row.w .rtext,.row.m .rtext{color:var(--ink)}
-@media (max-width:560px){
-  .rbtn{grid-template-columns:minmax(0,1fr);grid-template-areas:"lab" "track" "text";row-gap:4px}
-}
-.wt{flex:0 0 auto;align-self:center;font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:12px;padding:3px 9px;background:var(--bg);cursor:pointer;color:var(--ink);min-width:42px}
+.more-link{color:var(--muted);font-weight:600;white-space:nowrap}
+.rbtn:hover .more-link{color:var(--ink);text-decoration:underline}
+@media (max-width:560px){ .rbtn{grid-template-columns:minmax(0,1fr);grid-template-areas:"lab" "track" "text";row-gap:4px} }
+.wt{flex:0 0 auto;font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:12px;padding:3px 0;width:40px;background:var(--bg);cursor:pointer}
+.wt:hover{border-color:var(--muted)}
 .wt[data-w="0"]{color:var(--faint);text-decoration:line-through}
-.totop{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;
-  border:1px solid var(--line);background:var(--ink);color:var(--bg);border-radius:22px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px #0003;transition:opacity .2s}
-.totop[hidden]{display:none!important}
+.wt[data-w="2"],.wt[data-w="3"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
-/* ---------- detail ---------- */
-.detail{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px clamp(14px,3vw,26px) 20px;scroll-margin-top:16px}
-.detail .cat{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.detail h3{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(26px,4vw,36px);line-height:1;margin:4px 0 8px;text-wrap:balance}
-.headline{font-size:clamp(18px,2.4vw,22px);font-weight:600;margin:0 0 14px;max-width:60ch;text-wrap:pretty}
-.dgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:22px}
-@media (max-width:760px){.dgrid{grid-template-columns:minmax(0,1fr)}}
-.pair{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:6px 10px;align-items:center;font-size:14px}
+/* ---------- drawer ---------- */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:30;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:31;width:min(500px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:-8px 0 30px #0002;
+  transform:translateX(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);overflow-y:auto;overscroll-behavior:contain;
+  padding:calc(14px + env(safe-area-inset-top,0px)) calc(20px + env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 20px}
+.drawer.open{transform:none}
+.dtop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.close{border:1px solid var(--line);background:var(--bg);border-radius:18px;padding:5px 12px;font-size:14px;cursor:pointer}
+.drawer h3{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:32px;line-height:1;margin:4px 0 8px;text-wrap:balance}
+.headline{font-size:19px;font-weight:600;margin:0 0 14px;text-wrap:pretty}
+.pair{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:6px 10px;align-items:center;font-size:14px}
 .pair .who{color:var(--muted)}
-.pair .rail{height:14px;background:var(--grid);border-radius:3px;position:relative;overflow:hidden}
-.pair .fill{position:absolute;left:0;top:0;bottom:0;border-radius:0 3px 3px 0;transition:width .6s}
+.pair .rail{height:12px;background:var(--grid);border-radius:3px;position:relative;overflow:hidden}
+.pair .fill{position:absolute;left:0;top:0;bottom:0;border-radius:0 3px 3px 0}
 .pair .num{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
 .unit{font-size:13px;color:var(--muted);margin-top:6px}
-.hist{margin-top:16px;overflow-x:auto}
-.hist h4,.dtext h4{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:500}
+.drawer h4{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px;font-weight:500}
+.drawer p{margin:0 0 12px}
+.hist{overflow-x:auto}
 .hist table{border-collapse:collapse;width:100%;font-size:13px}
 .hist td,.hist th{padding:4px 6px;border-bottom:1px solid var(--grid);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .hist th{font-weight:600;color:var(--muted);font-size:12px}
 .hist td:first-child,.hist th:first-child{text-align:left}
-.dtext p{margin:0 0 14px;max-width:66ch}
 .ask{border-left:3px solid var(--ink);padding-left:12px;font-style:italic}
 .src{font-size:13px;color:var(--muted)}
-.src a{color:var(--muted)}
-.dirpick{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--line);border-radius:6px;font-size:14px}
-.dirpick .seg{margin-top:6px}
-.empty{color:var(--muted);font-size:15px}
+.dirpick{margin:12px 0 4px;padding:10px 12px;border:1px dashed var(--line);border-radius:6px;font-size:14px}
+.dirpick .seg{margin-top:8px}
 
 /* ---------- below the fold ---------- */
 section.more{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px 36px}
@@ -177,6 +166,12 @@ section.more li{margin-bottom:8px}
 .tscroll th,.tscroll td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 .tscroll td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+
+/* ---------- tooltip + back to top ---------- */
+.tip{position:fixed;z-index:40;pointer-events:none;background:var(--tipbg);color:var(--tipfg);font-size:13px;line-height:1.4;padding:8px 10px;border-radius:6px;max-width:260px;opacity:0;transition:opacity .12s}
+.tip.on{opacity:1}
+.totop{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;
+  border:1px solid var(--line);background:var(--ink);color:var(--bg);border-radius:22px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px #0003}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -185,9 +180,8 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
 <div class="wrap" lang="en" id="top">
   <header>
     <div class="eyebrow">Gender &amp; inequality · United States · By Gwen Sharp · <a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a></div>
-    <h1>Equal <span class="q">on</span> <span class="q q2">what?</span></h1>
-    <p class="lede">Is the U.S. gender-equal? The answer depends on what you measure. Each row below is one part of life. Think of each one as a tug-of-war: the knot starts in the middle, at <strong>even</strong>. Tap a row to see which way it moves.</p>
-    <p class="lede">The knot moves toward whichever group comes out ahead on that measure: left for men, right for women. The farther it moves, the bigger the gap.</p>
+    <h1>Equal <span class="q">on</span> <span class="q2">what?</span></h1>
+    <p class="lede">Is the U.S. gender-equal? It depends on what you measure. Each row below is one part of life, set up like a tug-of-war. The knot starts in the middle at <strong>even</strong>. Tap a row and the knot moves toward whoever comes out ahead.</p>
   </header>
 
   <div class="predict">
@@ -204,47 +198,34 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
   <div class="controls" role="group" aria-label="Controls">
     <div class="ctl"><span class="lab">Year</span>
       <div class="seg" id="eraSeg">
-        <button type="button" data-era="c1980" aria-pressed="false">Around 1980</button>
-        <button type="button" data-era="c2000" aria-pressed="false">Around 2000</button>
-        <button type="button" data-era="latest" aria-pressed="true">Latest</button>
+        <button type="button" data-era="c1980" aria-pressed="false" data-tip="Show each measure as it was around 1980, where comparable data exist.">Around 1980</button>
+        <button type="button" data-era="c2000" aria-pressed="false" data-tip="Show each measure as it was around 2000.">Around 2000</button>
+        <button type="button" data-era="latest" aria-pressed="true" data-tip="Show the most recent data available.">Latest</button>
       </div>
     </div>
-    <button type="button" class="btn" id="openAll" aria-pressed="false">Open every panel</button>
+    <div class="ctl"><span class="lab">Count</span>
+      <div class="seg" id="capSeg">
+        <button type="button" data-cap="none" aria-pressed="true" data-tip="Every revealed row counts toward the overall balance. Gaps favoring women and gaps favoring men can offset each other.">Both ways</button>
+        <button type="button" data-cap="women" aria-pressed="false" data-tip="Rows where women come out ahead count as zero, so the balance can only lean toward men. This is roughly how the World Economic Forum's Global Gender Gap Index works.">Only where women are behind</button>
+        <button type="button" data-cap="men" aria-pressed="false" data-tip="The mirror image: rows where men come out ahead count as zero, so the balance can only lean toward women. Same data, opposite rule.">Only where men are behind</button>
+      </div>
+    </div>
     <div class="spacer"></div>
+    <button type="button" class="btn" id="openAll" data-tip="Add every extra measure to the board. Watch how the balance shifts as the list grows.">Show all measures</button>
     <button type="button" class="btn primary" id="revealAll">Reveal all</button>
-    <button type="button" class="btn" id="resetAll">Reset to even</button>
+    <button type="button" class="btn" id="resetAll">Reset</button>
   </div>
 
-  <div class="score">
-    <div class="tally" aria-live="polite">
-      <div class="tile w"><div class="n" id="nW">0</div><div class="t">measures where women fare better</div></div>
-      <div class="tile m"><div class="n" id="nM">0</div><div class="t">measures where men fare better</div></div>
-      <div class="tile"><div class="n" id="nH">0</div><div class="t">still hidden</div></div>
+  <div class="band" id="band">
+    <div class="bandbar">
+      <span class="bm">◀ Men fare better</span>
+      <span class="brail" aria-hidden="true"><span class="bmid"></span><span class="bknot" id="bandKnot"></span></span>
+      <span class="bw">Women fare better ▶</span>
     </div>
-    <div class="meter">
-      <div class="head"><span class="title">Your index · average of the revealed rows</span><span class="verdict" id="verdict">Nothing revealed yet</span></div>
-      <div class="mtrack" aria-hidden="true"><div class="needle" id="needle"></div></div>
-      <div class="ends"><span>Men fare better</span><span>Even</span><span>Women fare better</span></div>
-      <div class="ctl" style="margin-top:10px"><span class="lab">Count</span>
-        <div class="seg" id="capSeg">
-          <button type="button" data-cap="none" aria-pressed="true">Both directions</button>
-          <button type="button" data-cap="women" aria-pressed="false">Only where women are behind</button>
-          <button type="button" data-cap="men" aria-pressed="false">Only where men are behind</button>
-        </div>
-        <button type="button" class="btn" id="weightBtn" aria-pressed="false">Weight the measures</button>
-      </div>
-      <p id="capNote" style="margin:8px 0 0;font-size:13px;color:var(--muted);max-width:60ch"></p>
-    </div>
-  </div>
-
-  <div class="key">
-    <div class="keybar"><span class="km">◀ Men fare better</span><span class="ke">even</span><span class="kw">Women fare better ▶</span></div>
-    <div class="keynote">The knot moves toward whoever comes out ahead. The farther it moves, the bigger the gap. Gray means there's no obvious “better,” so you decide.</div>
+    <div class="bandtext" id="bandText" aria-live="polite"></div>
   </div>
 
   <div class="board" id="board"></div>
-
-  <div class="detail" id="detail" aria-live="polite"><p class="empty">Tap any row to see the numbers behind it.</p></div>
 
   <section class="more">
     <div>
@@ -264,8 +245,8 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
       <ol>
         <li>Before you revealed anything, did you expect most knots to move to one side? Which result surprised you most?</li>
         <li>Switch the year to “Around 1980.” Which gaps closed, which reversed, and which barely moved?</li>
-        <li>Open the “School &amp; degrees” panel’s extra measures. How does the tally change? Who decides which measures belong on the board?</li>
-        <li>Turn on “Weight the measures.” Which three measures would you weight most heavily, and why? Compare with a classmate.</li>
+        <li>Open the extra measures in “School &amp; degrees.” How does the overall balance change? Who decides which measures belong on the board?</li>
+        <li>Use the ×1 buttons to weight the measures you care about most. Which three would you weight most heavily, and why? Compare with a classmate.</li>
         <li>Try “Only where women are behind,” then “Only where men are behind.” Real indexes make choices like this. What does each choice assume about what inequality <em>is</em>?</li>
         <li>Averages for “women” and “men” hide big differences by race, class, age, and region. Pick one row and predict how it might change for a specific group.</li>
         <li>A gap tells you <em>that</em> groups differ, not <em>why</em>. For one row, list two possible explanations a sociologist would want to test.</li>
@@ -277,7 +258,7 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
       <p>The side and color show who comes out ahead. For some measures higher is better (life expectancy, earnings). For others lower is better (homicide, poverty). A few have no obvious “better” direction, so their knots stay gray in the middle until you choose.</p>
       <p>Why are some shares “better” and others gray? A bigger share of all degrees, or of seats in Congress, means more education or more power for that group. A share of one field is different: more women in computer science means fewer men there, and the pay effects already show up in the earnings row. Whether a field split is a problem depends on why it exists, so you decide.</p>
       <p>Test scores are on scales without a true zero, so their rows compare the score difference to the spread of scores (the standard deviation) instead.</p>
-      <p>The index is a simple average of the signed gaps for the rows you’ve revealed. It’s a thinking tool, not a published measure.</p>
+      <p>The overall balance at the top is a weighted average of the gaps for the rows you’ve revealed. It’s a thinking tool, not a published measure.</p>
     </div>
     <div>
       <h2>Why this matters</h2>
@@ -294,6 +275,10 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
 
   <footer id="foot"></footer>
 </div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true" tabindex="-1"></aside>
+<div class="tip" id="tip" role="tooltip"></div>
 <button type="button" class="totop" id="toTop" hidden>↑ Back to top</button>
 
 <script>
@@ -607,12 +592,12 @@ const DATA = [
 /* DATA:END */
 
 const state = {
-  era: "latest", set: "core", pred: null, cap: "none", weighting: false,
+  era: "latest", cap: "none", pred: null,
   revealed: new Set(), open: new Set(), selected: null, weights: {}, dirChoice: {}
 };
 try { const s = JSON.parse(localStorage.getItem("eow-state") || "null"); if (s && s.dirChoice) state.dirChoice = s.dirChoice; } catch (e) {}
 function persist(){ try { localStorage.setItem("eow-state", JSON.stringify({dirChoice: state.dirChoice})); } catch (e) {} }
-
+const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function visible(){ return DATA.filter(d => !d.extra || state.open.has(d.cat)); }
 function dirOf(d){ return d.better === "ambiguous" ? (state.dirChoice[d.id] || "none") : d.better; }
@@ -621,16 +606,14 @@ function dirOf(d){ return d.better === "ambiguous" ? (state.dirChoice[d.id] || "
 function score(d, era){
   const v = d.vals[era || state.era];
   if (!v || v.w == null || v.m == null) return null;
-  let gap, womenHigher = v.w > v.m;
+  let gap; const womenHigher = v.w > v.m;
   if (d.kind === "sd") gap = Math.min(1, Math.abs(v.w - v.m) / (v.sd || d.sd));
   else { const hi = Math.max(v.w, v.m), lo = Math.min(v.w, v.m); gap = hi === 0 ? 0 : 1 - lo / hi; }
   const dir = dirOf(d);
-  if (dir === "none") return { gap, sign: 0, womenHigher };
+  if (dir === "none" || v.w === v.m) return { gap: dir === "none" ? gap : 0, sign: 0, womenHigher };
   const womenBetter = dir === "higher" ? womenHigher : !womenHigher;
-  if (v.w === v.m) return { gap: 0, sign: 0, womenHigher };
   return { gap, sign: womenBetter ? 1 : -1, womenHigher };
 }
-
 function fmt(d, x){
   if (x == null) return "—";
   const dp = d.dp ?? 1;
@@ -639,9 +622,9 @@ function fmt(d, x){
 function pct(g){ return Math.round(g * 100) + "%"; }
 function gl(d, g){ return d.kind === "sd" ? g.toFixed(2) + " SD" : pct(g); }
 
-/* ---------- render board ---------- */
+/* ---------- board ---------- */
 const board = document.getElementById("board");
-const EMPTY = `<p class="empty">Tap any row to see the numbers behind it.</p>`;
+const WT_TIP = "How much this row counts in the overall balance at the top. Click to change: ×1, ×2, ×3, then ×0 (left out).";
 function buildBoard(){
   board.innerHTML = "";
   const vis = visible();
@@ -656,63 +639,33 @@ function buildBoard(){
     const rows = p.querySelector(".rows");
     const mb = p.querySelector(".more-btn");
     if (mb) mb.addEventListener("click", () => {
-      if (state.open.has(cat.id)) {
-        state.open.delete(cat.id);
-        const sel = DATA.find(x => x.id === state.selected);
-        if (sel && sel.extra && sel.cat === cat.id) { state.selected = null; detail.innerHTML = EMPTY; }
-      } else state.open.add(cat.id);
+      if (state.open.has(cat.id)) state.open.delete(cat.id); else state.open.add(cat.id);
       syncOpenAll(); buildBoard(); update();
       const again = board.querySelector(`.panel[data-cat="${cat.id}"] .more-btn`); if (again) again.focus();
     });
     items.forEach(d => {
       const r = document.createElement("div");
-      r.className = "row" + (d.extra ? " extra" : ""); r.dataset.id = d.id;
+      r.className = "row"; r.dataset.id = d.id;
       r.innerHTML = `<button type="button" class="rbtn">
           <span class="rlabel">${d.label}</span>
           <span class="track" aria-hidden="true"><span class="rope"></span><span class="mid"></span><span class="pull"></span><span class="knot"><span class="qm">?</span></span></span>
           <span class="rtext"></span>
-        </button>${state.weighting ? `<button type="button" class="wt"></button>` : ""}`;
-      r.querySelector(".rbtn").addEventListener("click", () => {
-        state.revealed.add(d.id); state.selected = d.id; update(); showDetail(true);
+        </button><button type="button" class="wt" data-tip="${WT_TIP}"></button>`;
+      r.querySelector(".rbtn").addEventListener("click", e => {
+        if (!state.revealed.has(d.id)) { state.revealed.add(d.id); update(); bumpBand(); }
+        else openDrawer(d.id, e.currentTarget);
       });
-      const wt = r.querySelector(".wt");
-      if (wt) wt.addEventListener("click", () => cycleWeight(d.id));
+      r.querySelector(".wt").addEventListener("click", () => { cycleWeight(d.id); });
       rows.appendChild(r);
     });
     board.appendChild(p);
   });
+  bindTips(board);
 }
-function cycleWeight(id){ const w = state.weights[id] ?? 1; state.weights[id] = (w + 1) % 4; update(); }
+function cycleWeight(id){ const w = state.weights[id] ?? 1; state.weights[id] = w === 3 ? 0 : w + 1; update(); bumpBand(); }
 
-function update(){
+function computeBalance(){
   const vis = visible();
-  document.querySelectorAll(".row").forEach(el => {
-    const d = DATA.find(x => x.id === el.dataset.id);
-    const s = score(d);
-    const shown = state.revealed.has(d.id);
-    const knot = el.querySelector(".knot"), pull = el.querySelector(".pull"), txt = el.querySelector(".rtext"), btn = el.querySelector(".rbtn");
-    el.classList.toggle("sel", state.selected === d.id);
-    btn.setAttribute("aria-pressed", state.selected === d.id ? "true" : "false");
-    el.classList.toggle("hidden", !shown);
-    el.classList.remove("w", "m", "n", "nodata");
-    let pos = 0; // -1 (men side) .. +1 (women side)
-    if (!shown) { txt.textContent = "Tap to reveal"; }
-    else if (s === null) { el.classList.add("nodata"); txt.textContent = "No comparable figure for this period."; }
-    else {
-      const v = d.vals[state.era];
-      txt.textContent = d.say(v.w, v.m) + (s.sign === 0 ? " Which way is better? Open it and decide." : "");
-      if (s.sign === 0) el.classList.add("n");
-      else { el.classList.add(s.sign > 0 ? "w" : "m"); pos = s.sign * Math.max(s.gap, 0.015); }
-    }
-    knot.style.left = (50 + pos * 46) + "%";
-    pull.style.left = (pos < 0 ? 50 + pos * 46 : 50) + "%";
-    pull.style.width = Math.abs(pos * 46) + "%";
-    const w = el.querySelector(".wt");
-    if (w){ const wv = state.weights[d.id] ?? 1; w.dataset.w = wv; w.textContent = "×" + wv; w.setAttribute("aria-label", `Weight for ${d.label}: ${wv}. Press to change.`); w.title = "How much this measure counts in your index"; }
-    const desc = !shown ? "hidden, press to reveal" : s === null ? "no comparable data for this year" : (s.sign > 0 ? "women fare better" : s.sign < 0 ? "men fare better" : "no direction chosen") + `, gap ${gl(d, s.gap)}`;
-    btn.setAttribute("aria-label", `${d.label}: ${desc}`);
-  });
-  // tally + index
   let nW = 0, nM = 0, nH = 0, num = 0, den = 0;
   vis.forEach(d => {
     if (!state.revealed.has(d.id)) { nH++; return; }
@@ -720,153 +673,208 @@ function update(){
     if (s.sign > 0 && s.gap >= 0.005) nW++;
     if (s.sign < 0 && s.gap >= 0.005) nM++;
     if (s.sign === 0) return;
-    const w = state.weighting ? (state.weights[d.id] ?? 1) : 1;
+    const w = state.weights[d.id] ?? 1;
+    if (!w) return;
     let v = s.sign * s.gap;
     if (state.cap === "women" && v > 0) v = 0;   // like the WEF cap: women's advantages don't count
     if (state.cap === "men" && v < 0) v = 0;
     num += w * v; den += w;
   });
-  document.getElementById("nW").textContent = nW;
-  document.getElementById("nM").textContent = nM;
-  document.getElementById("nH").textContent = nH;
-  const po = document.getElementById("predOut");
-  if (state.pred && nH === 0 && vis.length){
-    const lab = {women: "women fare better", men: "men fare better", even: "about even"}[state.pred];
-    const idx = den ? num / den : 0, pts = Math.abs(idx * 100);
-    const lean = !den ? "has no rows with a direction yet" : pts < 1.5 ? "comes out about even" : `leans toward ${idx > 0 ? "women" : "men"} faring better`;
-    po.textContent = `You predicted “${lab}.” The rows split ${nW} for women and ${nM} for men, and your index ${lean}. Now change the year, the measures or the weights and see how the answer moves.`;
-  } else if (state.pred) po.textContent = `Your prediction: ${ {women: "women fare better", men: "men fare better", even: "about even"}[state.pred] }. Reveal the rows to check it.`;
-  else po.textContent = "";
-  const needle = document.getElementById("needle"), verdict = document.getElementById("verdict");
-  if (!den){ needle.style.left = "50%"; verdict.textContent = state.revealed.size ? "No rows with a direction yet" : "Nothing revealed yet"; }
-  else {
-    const idx = num / den; // -1..1
-    needle.style.left = (50 + idx * 50 * 2.2 > 98 ? 98 : 50 + idx * 50 * 2.2 < 2 ? 2 : 50 + idx * 50 * 2.2) + "%";
-    const pts = Math.abs(idx * 100);
-    verdict.textContent = pts < 1.5 ? "About even" : (idx > 0 ? "Leans women: +" : "Leans men: −") + pts.toFixed(1) + " pts";
-  }
-  document.getElementById("capNote").textContent = {
-    none: "Every revealed row counts. Gaps favoring women and gaps favoring men can offset each other.",
-    women: "Rows where women come out ahead count as zero, so the index can only lean toward men. This is roughly how the World Economic Forum's Global Gender Gap Index works.",
-    men: "The mirror image: rows where men come out ahead count as zero, so the index can only lean toward women. Same data, opposite rule."
-  }[state.cap];
-  if (state.selected) showDetail(false);
+  return { nW, nM, nH, idx: den ? num / den : null, total: vis.length };
 }
 
-/* ---------- detail ---------- */
-const detail = document.getElementById("detail");
-function showDetail(scroll){
-  const d = DATA.find(x => x.id === state.selected); if (!d) return;
+function update(){
+  document.querySelectorAll(".row").forEach(el => {
+    const d = DATA.find(x => x.id === el.dataset.id);
+    const s = score(d);
+    const shown = state.revealed.has(d.id);
+    const knot = el.querySelector(".knot"), pull = el.querySelector(".pull"), txt = el.querySelector(".rtext"), btn = el.querySelector(".rbtn");
+    el.classList.toggle("sel", state.selected === d.id);
+    el.classList.toggle("hidden", !shown);
+    el.classList.remove("w", "m", "n", "nodata");
+    let pos = 0;
+    if (!shown) txt.textContent = "Tap to reveal";
+    else if (s === null) { el.classList.add("nodata"); txt.innerHTML = `No comparable figure for this period. <span class="more-link">Details ›</span>`; }
+    else {
+      const v = d.vals[state.era];
+      txt.innerHTML = `${d.say(v.w, v.m)}${s.sign === 0 && d.better === "ambiguous" ? " Which way is better? You decide." : ""} <span class="more-link">Details ›</span>`;
+      if (s.sign === 0) el.classList.add("n");
+      else { el.classList.add(s.sign > 0 ? "w" : "m"); pos = s.sign * Math.max(s.gap, 0.015); }
+    }
+    knot.style.left = (50 + pos * 47) + "%";
+    pull.style.left = (pos < 0 ? 50 + pos * 47 : 50) + "%";
+    pull.style.width = Math.abs(pos * 47) + "%";
+    const w = el.querySelector(".wt"), wv = state.weights[d.id] ?? 1;
+    w.dataset.w = wv; w.textContent = "×" + wv; w.setAttribute("aria-label", `Weight for ${d.label}: ×${wv}. Press to change.`);
+    const desc = !shown ? "hidden, press to reveal" : s === null ? "no comparable data for this year" : (s.sign > 0 ? "women fare better" : s.sign < 0 ? "men fare better" : "no direction chosen") + `, gap ${gl(d, s.gap)}. Press for details`;
+    btn.setAttribute("aria-label", `${d.label}: ${desc}`);
+  });
+
+  const B = computeBalance();
+  const knot = document.getElementById("bandKnot"), bt = document.getElementById("bandText");
+  knot.classList.remove("w", "m");
+  let lean;
+  if (B.idx === null) { knot.style.left = "50%"; lean = state.revealed.size ? "No rows with a direction yet" : "Overall: nothing revealed yet"; }
+  else {
+    knot.style.left = (50 + Math.max(-1, Math.min(1, B.idx)) * 47) + "%";
+    const pts = Math.abs(B.idx * 100);
+    if (pts >= 1.5) knot.classList.add(B.idx > 0 ? "w" : "m");
+    lean = pts < 1.5 ? "Overall: about even" : `Overall: leans ${B.idx > 0 ? "women" : "men"} (${pts.toFixed(1)} points)`;
+  }
+  const capNote = state.cap === "women" ? " · counting only where women are behind" : state.cap === "men" ? " · counting only where men are behind" : "";
+  bt.innerHTML = `<strong>${lean}</strong><span><span class="cw">${B.nW}</span> rows favor women · <span class="cm">${B.nM}</span> favor men · ${B.nH} hidden${capNote}</span>`;
+
+  const po = document.getElementById("predOut");
+  const plab = {women: "women fare better", men: "men fare better", even: "about even"}[state.pred];
+  if (state.pred && B.nH === 0 && B.total){
+    const pts = B.idx === null ? 0 : Math.abs(B.idx * 100);
+    const res = B.idx === null ? "has no rows with a direction yet" : pts < 1.5 ? "comes out about even" : `leans toward ${B.idx > 0 ? "women" : "men"} faring better`;
+    po.textContent = `You predicted “${plab}.” The rows split ${B.nW} for women and ${B.nM} for men, and the overall balance ${res}. Now change the year, the measures or the weights and see how the answer moves.`;
+  } else po.textContent = state.pred ? `Your prediction: ${plab}. Reveal the rows to check it.` : "";
+  if (state.selected && drawer.classList.contains("open")) renderDrawer(state.selected);
+}
+function bumpBand(){
+  if (reduceMotion()) return;
+  const k = document.getElementById("bandKnot"); k.classList.remove("bump"); void k.offsetWidth; k.classList.add("bump");
+}
+
+/* ---------- drawer ---------- */
+const drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim");
+let lastFocus = null;
+drawer.inert = true;
+function openDrawer(id, from){
+  state.selected = id; lastFocus = from || null;
+  renderDrawer(id);
+  drawer.inert = false; drawer.classList.add("open"); scrim.classList.add("open"); drawer.setAttribute("aria-hidden", "false");
+  document.body.classList.add("locked");
+  update();
+  setTimeout(() => { const c = drawer.querySelector(".close"); if (c) c.focus({preventScroll: true}); }, 50);
+}
+function closeDrawer(){
+  drawer.classList.remove("open"); scrim.classList.remove("open"); drawer.setAttribute("aria-hidden", "true"); drawer.inert = true;
+  document.body.classList.remove("locked");
+  state.selected = null; update();
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus({preventScroll: true});
+}
+scrim.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer(); });
+
+function renderDrawer(id){
+  const d = DATA.find(x => x.id === id); if (!d) return;
   const cat = CATS.find(c => c.id === d.cat);
   const v = d.vals[state.era]; const s = score(d);
-  const max = v ? Math.max(v.w ?? 0, v.m ?? 0) * (d.kind === "sd" ? 1.0 : 1) : 0;
-  const base = d.kind === "sd" ? (d.axisMin ?? 0) : 0;
-  const wpct = v && v.w != null ? ((v.w - base) / (max - base || 1)) * 100 : 0;
-  const mpct = v && v.m != null ? ((v.m - base) / (max - base || 1)) * 100 : 0;
+  const max = v ? Math.max(v.w ?? 0, v.m ?? 0) : 0;
+  const wpct = v && v.w != null ? v.w / (max || 1) * 100 : 0;
+  const mpct = v && v.m != null ? v.m / (max || 1) * 100 : 0;
   const head = v && v.w != null ? d.say(v.w, v.m) : "No comparable figure in this series for this period.";
+  const who = !s ? "" : s.sign > 0 ? "Women fare better" : s.sign < 0 ? "Men fare better" : "No direction chosen";
   const eras = [["c1980", "Around 1980"], ["c2000", "Around 2000"], ["latest", "Latest"]];
   const rows = eras.map(([k, lab]) => {
     const x = d.vals[k]; const sc = score(d, k);
     if (!x || x.w == null) return `<tr><td>${lab}</td><td colspan="4" style="text-align:left;color:var(--faint)">no comparable data</td></tr>`;
-    const who = !sc || sc.sign === 0 ? "—" : sc.sign > 0 ? "women" : "men";
-    return `<tr${k === state.era ? ' style="font-weight:700"' : ""}><td>${lab} (${x.year})</td><td>${fmt(d, x.w)}</td><td>${fmt(d, x.m)}</td><td>${gl(d, sc.gap)}</td><td>${who}</td></tr>`;
+    const w = !sc || sc.sign === 0 ? "—" : sc.sign > 0 ? "women" : "men";
+    return `<tr${k === state.era ? ' style="font-weight:700"' : ""}><td>${x.year}</td><td>${fmt(d, x.w)}</td><td>${fmt(d, x.m)}</td><td>${gl(d, sc.gap)}</td><td>${w}</td></tr>`;
   }).join("");
   const dirUI = d.better === "ambiguous" ? `<div class="dirpick"><strong>Which way is “better” here?</strong> ${d.dirq || ""}
-      <div><div class="seg" id="dirSeg">
+      <div class="seg" id="dirSeg">
         <button type="button" data-dir="higher" aria-pressed="${dirOf(d) === "higher"}">Higher is better</button>
         <button type="button" data-dir="lower" aria-pressed="${dirOf(d) === "lower"}">Lower is better</button>
         <button type="button" data-dir="none" aria-pressed="${dirOf(d) === "none"}">Neither</button>
-      </div></div></div>` : "";
-  detail.innerHTML = `
-    <div class="cat">${cat.name}${d.extra ? " · extra measure" : ""}</div>
-    <h3>${d.title}</h3>
+      </div></div>` : "";
+  drawer.innerHTML = `
+    <div class="dtop"><span class="lab">${cat.name}${d.extra ? " · extra measure" : ""}</span><button type="button" class="close">Close ✕</button></div>
+    <h3 id="dTitle">${d.title}</h3>
     <p class="headline">${head}</p>
-    <div class="dgrid">
-      <div>
-        <div class="pair">
-          <span class="who">Women</span><span class="rail"><span class="fill" style="width:${wpct}%;background:var(--women)"></span></span><span class="num">${v ? fmt(d, v.w) : "—"}</span>
-          <span class="who">Men</span><span class="rail"><span class="fill" style="width:${mpct}%;background:var(--men)"></span></span><span class="num">${v ? fmt(d, v.m) : "—"}</span>
-        </div>
-        <div class="unit">${d.unit}${v && v.year ? " · " + v.year : ""}${s ? " · gap " + gl(d, s.gap) : ""}</div>
-        <div class="hist"><h4>Over time</h4>
-          <table><thead><tr><th>Period</th><th>Women</th><th>Men</th><th>Gap</th><th>Better off</th></tr></thead><tbody>${rows}</tbody></table>
-          ${d.histNote ? `<div class="unit">${d.histNote}</div>` : ""}
-        </div>
-      </div>
-      <div class="dtext">
-        ${dirUI}
-        <h4>What’s behind it</h4><p>${d.note}</p>
-        <h4>Ask</h4><p class="ask">${d.ask}</p>
-        <p class="src">Source: ${d.src.map(x => `<a href="${x.url}" target="_blank" rel="noopener">${x.name}</a>`).join("; ")}</p>
-      </div>
-    </div>`;
-  const ds = document.getElementById("dirSeg");
+    <div class="pair">
+      <span class="who">Women</span><span class="rail"><span class="fill" style="width:${wpct}%;background:var(--women)"></span></span><span class="num">${v ? fmt(d, v.w) : "—"}</span>
+      <span class="who">Men</span><span class="rail"><span class="fill" style="width:${mpct}%;background:var(--men)"></span></span><span class="num">${v ? fmt(d, v.m) : "—"}</span>
+    </div>
+    <div class="unit">${d.unit}${v && v.year ? " · " + v.year : ""}${s ? ` · ${who.toLowerCase()} · gap ${gl(d, s.gap)}` : ""}</div>
+    ${dirUI}
+    <h4>What’s behind it</h4><p>${d.note}</p>
+    <h4>Ask</h4><p class="ask">${d.ask}</p>
+    <h4>Over time</h4>
+    <div class="hist"><table><thead><tr><th>Year</th><th>Women</th><th>Men</th><th>Gap</th><th>Better off</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${d.histNote ? `<div class="unit">${d.histNote}</div>` : ""}
+    <h4>Source</h4><p class="src">${d.src.map(x => `<a href="${x.url}" target="_blank" rel="noopener">${x.name}</a>`).join("; ")}</p>`;
+  drawer.querySelector(".close").addEventListener("click", closeDrawer);
+  const ds = drawer.querySelector("#dirSeg");
   if (ds) ds.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
-    state.dirChoice[d.id] = btn.dataset.dir; persist(); update();
+    state.dirChoice[d.id] = btn.dataset.dir; persist(); update(); bumpBand();
+    const again = drawer.querySelector(`#dirSeg button[data-dir="${btn.dataset.dir}"]`); if (again) again.focus({preventScroll: true});
   }));
-  if (scroll){
-    const r = detail.getBoundingClientRect();
-    if (r.top > window.innerHeight - 120) detail.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start"});
-  }
 }
+
+/* ---------- tooltips ---------- */
+const tip = document.getElementById("tip");
+function placeTip(el){
+  const r = el.getBoundingClientRect();
+  tip.textContent = el.dataset.tip; tip.classList.add("on");
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let x = Math.min(Math.max(8, r.left + r.width / 2 - tw / 2), window.innerWidth - tw - 8);
+  let y = r.bottom + 8; if (y + th > window.innerHeight - 8) y = r.top - th - 8;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+function hideTip(){ tip.classList.remove("on"); }
+function bindTips(root){
+  root.querySelectorAll("[data-tip]").forEach(el => {
+    if (el.dataset.tipBound) return; el.dataset.tipBound = "1";
+    el.addEventListener("pointerenter", e => { if (e.pointerType !== "touch") placeTip(el); });
+    el.addEventListener("pointerleave", hideTip);
+    el.addEventListener("focus", () => { if (el.matches(":focus-visible")) placeTip(el); });
+    el.addEventListener("blur", hideTip);
+    el.addEventListener("click", hideTip);
+  });
+}
+window.addEventListener("scroll", hideTip, {passive: true});
 
 /* ---------- table ---------- */
 function buildTable(){
   const t = document.getElementById("dataTable");
   const eraName = {c1980: "c. 1980", c2000: "c. 2000", latest: "Latest"};
   let h = `<thead><tr><th>Measure</th><th>Period (year)</th><th>Women</th><th>Men</th><th>Gap</th><th>Better off</th><th>Source</th></tr></thead><tbody>`;
-  DATA.forEach(d => ["c1980", "c2000", "latest"].forEach((k, i) => {
+  DATA.forEach(d => ["c1980", "c2000", "latest"].forEach(k => {
     const x = d.vals[k]; if (!x || x.w == null) return;
     const sc = score(d, k);
     const who = d.better === "ambiguous" ? "you decide" : sc.sign > 0 ? "women" : sc.sign < 0 ? "men" : "—";
-    h += `<tr><td>${i === 2 || !d.vals.latest ? `<strong>${d.title}</strong><br><span style="color:var(--muted)">${d.unit}</span>` : d.title}</td><td>${eraName[k]} (${x.year})</td><td class="n">${fmt(d, x.w)}</td><td class="n">${fmt(d, x.m)}</td><td class="n">${gl(d, sc.gap)}</td><td>${who}</td><td>${(x.src || d.src).map ? (x.src || d.src).map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.name}</a>`).join("; ") : ""}</td></tr>`;
+    h += `<tr><td><strong>${d.title}</strong><br><span style="color:var(--muted)">${d.unit}</span></td><td>${eraName[k]} (${x.year})</td><td class="n">${fmt(d, x.w)}</td><td class="n">${fmt(d, x.m)}</td><td class="n">${gl(d, sc.gap)}</td><td>${who}</td><td>${d.src.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.name}</a>`).join("; ")}</td></tr>`;
   }));
   t.innerHTML = h + "</tbody>";
 }
 
 /* ---------- controls ---------- */
-function segBind(id, key, after){
+function segBind(id, key){
   const seg = document.getElementById(id);
   seg.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     state[key] = b.dataset[key];
     seg.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    (after || update)();
+    update(); if (key !== "pred") bumpBand();
   }));
 }
-segBind("eraSeg", "era");
-segBind("predSeg", "pred");
+segBind("eraSeg", "era"); segBind("capSeg", "cap"); segBind("predSeg", "pred");
 function syncOpenAll(){
   const all = CATS.every(c => !DATA.some(d => d.cat === c.id && d.extra) || state.open.has(c.id));
-  const b = document.getElementById("openAll"); b.setAttribute("aria-pressed", all); b.textContent = all ? "Close extra measures" : "Open every panel";
+  const b = document.getElementById("openAll"); b.setAttribute("aria-pressed", all); b.textContent = all ? "Show headline measures" : "Show all measures";
 }
 document.getElementById("openAll").addEventListener("click", () => {
   const all = document.getElementById("openAll").getAttribute("aria-pressed") === "true";
-  if (all) { state.open.clear(); if (state.selected && DATA.find(x => x.id === state.selected).extra) { state.selected = null; detail.innerHTML = EMPTY; } }
-  else CATS.forEach(c => state.open.add(c.id));
-  syncOpenAll(); buildBoard(); update();
-});
-segBind("capSeg", "cap");
-document.getElementById("weightBtn").addEventListener("click", e => {
-  state.weighting = !state.weighting; e.currentTarget.setAttribute("aria-pressed", state.weighting);
-  e.currentTarget.classList.toggle("primary", state.weighting);
-  buildBoard(); update();
+  if (all) state.open.clear(); else CATS.forEach(c => state.open.add(c.id));
+  syncOpenAll(); buildBoard(); update(); bumpBand();
 });
 document.getElementById("revealAll").addEventListener("click", () => {
-  const vis = visible(); let i = 0;
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce){ vis.forEach(d => state.revealed.add(d.id)); update(); return; }
+  const vis = visible().filter(d => !state.revealed.has(d.id)); let i = 0;
+  if (reduceMotion()){ vis.forEach(d => state.revealed.add(d.id)); update(); return; }
   (function step(){ if (i >= vis.length) return; state.revealed.add(vis[i++].id); update(); setTimeout(step, 90); })();
 });
-document.getElementById("resetAll").addEventListener("click", () => {
-  state.revealed.clear(); state.selected = null; update();
-  detail.innerHTML = EMPTY;
-});
+document.getElementById("resetAll").addEventListener("click", () => { state.revealed.clear(); state.weights = {}; update(); });
 
-document.getElementById("foot").innerHTML = `Created by Gwen Sharp (<a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a>). Data compiled ${AS_OF} from U.S. federal statistical agencies and other primary sources listed above. Figures are national averages for women and men as reported by each source; most federal surveys report sex as female/male. Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>.`;
 const toTop = document.getElementById("toTop");
 function onScroll(){ toTop.hidden = window.scrollY < 700; }
 window.addEventListener("scroll", onScroll, {passive: true}); onScroll();
-toTop.addEventListener("click", () => { window.scrollTo({top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); document.getElementById("predSeg").querySelector("button").focus({preventScroll: true}); });
+toTop.addEventListener("click", () => { window.scrollTo({top: 0, behavior: reduceMotion() ? "auto" : "smooth"}); });
+
+document.getElementById("foot").innerHTML = `Created by Gwen Sharp (<a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a>). Data compiled ${AS_OF} from U.S. federal statistical agencies and other primary sources listed above. Figures are national averages for women and men as reported by each source; most federal surveys report sex as female/male. Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>.`;
+bindTips(document);
 buildBoard(); update(); buildTable();
 </script>
 

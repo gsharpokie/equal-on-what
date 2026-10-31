@@ -6,11 +6,11 @@ An interactive look at how U.S. women and men fare across 30+ measures: earnings
 
 ## What it does
 
-- Each measure is a tug-of-war row. The knot starts at "even" and moves toward whichever group fares better.
+- Each measure is a tug-of-war row. The knot starts at "even" and moves toward whichever group fares better. A pinned band at the top shows the overall balance as rows are revealed.
 - Students predict the overall result first, then reveal rows one at a time.
 - A year switch compares around 1980, around 2000, and the latest data.
 - Each panel opens into extra measures (for example, test scores and degree fields under education).
-- A build-your-own index lets users weight measures and choose whether to count gaps in both directions or only one, as some published indexes do.
+- Weight buttons on every row let users decide how much each measure counts, and choose whether to count gaps in both directions or only one, as some published indexes do.
 
 ## Data
 
