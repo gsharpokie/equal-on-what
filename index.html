@@ -85,8 +85,8 @@ h1 .q{color:var(--women)} h1 .q2{color:var(--men)}
 }
 
 /* ---------- board ---------- */
-.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:12px;align-items:start;margin-top:8px}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 10px 6px 12px;min-width:0}
+.board{columns:2 480px;column-gap:12px;margin-top:8px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 10px 6px 12px;min-width:0;break-inside:avoid;margin:0 0 12px;display:block;width:100%}
 .phead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:2px;flex-wrap:wrap}
 .panel h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:22px;letter-spacing:.03em;margin:0;line-height:1}
 .more-btn{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:3px 11px;font-size:12px;cursor:pointer;white-space:nowrap}
@@ -183,7 +183,7 @@ footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid va
   <header>
     <div class="eyebrow">Gender &amp; inequality · United States · By Gwen Sharp · <a href="https://x.com/gsharpokie" target="_blank" rel="noopener">@gsharpokie</a></div>
     <h1>Equal <span class="q">on</span> <span class="q2">what?</span></h1>
-    <p class="lede">Is the U.S. gender-equal? It depends on what you measure. Each row below is one part of life, set up like a tug-of-war. The knot starts in the middle at <strong>even</strong>. Tap a row and the knot moves toward whoever comes out ahead.</p>
+    <p class="lede">Is the U.S. gender-equal? It depends on what you measure. Each row below is one part of life, set up like a tug-of-war. The knot starts in the middle at <strong>even</strong>. Tap a row and the knot moves toward whoever comes out ahead, then the details and sources open.</p>
     <p class="lede" style="margin-top:10px;color:var(--muted);font-size:16px">Think some things matter more than others? Use the <strong style="color:var(--ink)">weight</strong> button on each row to make it count double, triple, or not at all. The overall balance at the top updates as you go.</p>
   </header>
 
@@ -627,6 +627,7 @@ function gl(d, g){ return d.kind === "sd" ? g.toFixed(2) + " SD" : pct(g); }
 
 /* ---------- board ---------- */
 const board = document.getElementById("board");
+let revealTimer = null;
 const WT_TIP = "How much this row counts in the overall balance at the top. Click to change: ×1, ×2, ×3, then ×0 (left out).";
 function buildBoard(){
   board.innerHTML = "";
@@ -655,8 +656,12 @@ function buildBoard(){
           <span class="rtext"></span>
         </button><button type="button" class="wt" data-tip="${WT_TIP}"></button>`;
       r.querySelector(".rbtn").addEventListener("click", e => {
-        if (!state.revealed.has(d.id)) { state.revealed.add(d.id); update(); bumpBand(); }
-        else openDrawer(d.id, e.currentTarget);
+        const btn = e.currentTarget;
+        if (!state.revealed.has(d.id)) {
+          state.revealed.add(d.id); state.selected = d.id; update(); bumpBand();
+          clearTimeout(revealTimer);
+          revealTimer = setTimeout(() => openDrawer(d.id, btn), reduceMotion() ? 0 : 650);  // let the knot move first
+        } else openDrawer(d.id, btn);
       });
       r.querySelector(".wt").addEventListener("click", () => { cycleWeight(d.id); });
       rows.appendChild(r);
